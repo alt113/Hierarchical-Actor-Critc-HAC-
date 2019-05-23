@@ -5,20 +5,62 @@ import os
 import pickle as cpickle
 
 
-# Below class instantiates an agent
 class Agent:
+    """TODO
 
-    def __init__(self, FLAGS, env, agent_params):
+    TODO
 
-        self.FLAGS = FLAGS
+    Attributes
+    ----------
+    flags : TODO
+        TODO
+    sess : tf.Session
+        the tensorflow session
+    subgoal_test_perc : TODO
+        subgoal testing ratio each layer will use
+    layers : TODO
+        TODO
+    saver : TODO
+        TODO
+    model_dir : TODO
+        TODO
+    model_loc : TODO
+        TODO
+    goal_array : TODO
+        TODO
+    current_state : TODO
+        TODO
+    steps_taken : int
+        number of low-level actions executed
+    num_updates : int
+        number of Q-value updates made after each episode
+    performance_log : list of TODO
+        used to store performance results
+    other_params : TODO
+        TODO
+    """
+
+    def __init__(self, flags, env, agent_params):
+        """Instantiate the Agent object.
+
+        Parameters
+        ----------
+        flags : TODO
+            TODO
+        env : TODO
+            TODO
+        agent_params : TODO
+            TODO
+        """
+        self.flags = flags
         self.sess = tf.Session()
 
         # Set subgoal testing ratio each layer will use
         self.subgoal_test_perc = agent_params["subgoal_test_perc"]
 
         # Create agent with number of levels specified by user
-        self.layers = [Layer(i, FLAGS, env, self.sess, agent_params)
-                       for i in range(FLAGS.layers)]
+        self.layers = [Layer(i, flags, env, self.sess, agent_params)
+                       for i in range(flags.layers)]
 
         # Below attributes will be used help save network parameters
         self.saver = None
@@ -30,7 +72,7 @@ class Agent:
         self.initialize_networks()
 
         # goal_array will store goal for each layer of agent.
-        self.goal_array = [None for i in range(FLAGS.layers)]
+        self.goal_array = [None for _ in range(flags.layers)]
 
         self.current_state = None
 
@@ -46,13 +88,22 @@ class Agent:
 
         self.other_params = agent_params
 
-    # Determine whether or not each layer's goal was achieved. Also, if
-    # applicable, return the highest level whose goal was achieved.
     def check_goals(self, env):
+        """Determine whether or not each layer's goal was achieved.
 
+        Parameters
+        ----------
+        env : TODO
+            TODO
+
+        Returns
+        -------
+        TODO
+            If applicable, return the highest level whose goal was achieved.
+        """
         # goal_status is vector showing status of whether a layer's goal has
         # been achieved
-        goal_status = [False for _ in range(self.FLAGS.layers)]
+        goal_status = [False for _ in range(self.flags.layers)]
 
         max_lay_achieved = None
 
@@ -62,12 +113,12 @@ class Agent:
         proj_end_goal = env.project_state_to_end_goal(
             env.sim, self.current_state)
 
-        for i in range(self.FLAGS.layers):
+        for i in range(self.flags.layers):
 
             goal_achieved = True
 
             # If at highest layer, compare to end goal thresholds
-            if i == self.FLAGS.layers - 1:
+            if i == self.flags.layers - 1:
 
                 # Check dimensions are appropriate
                 assert len(proj_end_goal) == len(self.goal_array[i]) == \
@@ -110,7 +161,7 @@ class Agent:
         return goal_status, max_lay_achieved
 
     def initialize_networks(self):
-
+        """TODO"""
         model_vars = tf.trainable_variables()
         self.saver = tf.train.Saver(model_vars)
 
@@ -126,28 +177,47 @@ class Agent:
 
         # If not retraining, restore weights
         # if we are not retraining from scratch, just restore weights
-        if not self.FLAGS.retrain:
+        if not self.flags.retrain:
             self.saver.restore(
                 self.sess, tf.train.latest_checkpoint(self.model_dir))
 
-    # Save neural network parameters
     def save_model(self, episode):
+        """Save neural network parameters.
+
+        TODO: describe how they are saved
+
+        Parameters
+        ----------
+        episode : TODO
+            TODO
+        """
         self.saver.save(self.sess, self.model_loc, global_step=episode)
 
-    # Update actor and critic networks for each layer
     def learn(self):
-
+        """Update actor and critic networks for each layer."""
         for i in range(len(self.layers)):
             self.layers[i].learn(self.num_updates)
 
-    # Train agent for an episode
     def train(self, env, episode_num):
+        """Train agent for an episode.
 
+        Parameters
+        ----------
+        env : TODO
+            TODO
+        episode_num : int
+            TODO
+
+        Returns
+        -------
+        TODO
+            TODO
+        """
         # Select final goal from final goal space, defined in
         # "design_agent_and_env.py"
-        self.goal_array[self.FLAGS.layers - 1] = env.get_next_goal(
-            self.FLAGS.test)
-        print("Next End Goal: ", self.goal_array[self.FLAGS.layers - 1])
+        self.goal_array[self.flags.layers - 1] = env.get_next_goal(
+            self.flags.test)
+        print("Next End Goal: ", self.goal_array[self.flags.layers - 1])
 
         # Select initial state from in initial state space, defined in
         # environment.py
@@ -158,19 +228,27 @@ class Agent:
         self.steps_taken = 0
 
         # Train for an episode
-        goal_status, max_lay_achieved = self.layers[self.FLAGS.layers-1].train(
+        goal_status, max_lay_achieved = self.layers[self.flags.layers-1].train(
             self, env, episode_num=episode_num)
 
         # Update actor/critic networks if not testing
-        if not self.FLAGS.test:
+        if not self.flags.test:
             self.learn()
 
         # Return whether end goal was achieved
-        return goal_status[self.FLAGS.layers-1]
+        return goal_status[self.flags.layers-1]
 
     # Save performance evaluations
     def log_performance(self, success_rate):
+        """Save performance evaluations.
 
+        TODO: describe how this is done and how it's helpful.
+
+        Parameters
+        ----------
+        success_rate : TODO
+            TODO
+        """
         # Add latest success_rate to list
         self.performance_log.append(success_rate)
 

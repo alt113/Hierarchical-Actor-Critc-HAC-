@@ -3,6 +3,61 @@ from mujoco_py import load_model_from_path, MjSim, MjViewer
 
 
 class Environment:
+    """TODO
+
+    TODO
+
+    Attributes
+    ----------
+    name : TODO
+        TODO
+    model : TODO
+        TODO
+    sim : TODO
+        TODO
+    state_dim : TODO
+        TODO
+    action_dim : TODO
+        TODO
+    action_bounds : TODO
+        TODO
+    action_offset : TODO
+        TODO
+    end_goal_dim : TODO
+        TODO
+    subgoal_dim : TODO
+        TODO
+    subgoal_bounds : TODO
+        TODO
+    project_state_to_end_goal : TODO
+        TODO
+    project_state_to_subgoal : TODO
+        TODO
+    subgoal_bounds_symmetric : TODO
+        TODO
+    subgoal_bounds_offset : TODO
+        TODO
+    end_goal_thresholds : TODO
+        TODO
+    subgoal_thresholds : TODO
+        TODO
+    initial_state_space : TODO
+        TODO
+    goal_space_train : TODO
+        TODO
+    goal_space_test : TODO
+        TODO
+    subgoal_colors : TODO
+        TODO
+    max_actions : TODO
+        TODO
+    visualize : TODO
+        TODO
+    viewer : TODO
+        TODO
+    num_frames_skip : TODO
+        TODO
+    """
 
     def __init__(self,
                  model_name,
@@ -17,7 +72,35 @@ class Environment:
                  max_actions=1200,
                  num_frames_skip=10,
                  show=False):
+        """Instantiate the Environment object.
 
+        Parameters
+        ----------
+        model_name : str
+            TODO
+        goal_space_train : TODO
+            TODO
+        goal_space_test : TODO
+            TODO
+        project_state_to_end_goal : TODO
+            TODO
+        end_goal_thresholds : TODO
+            TODO
+        initial_state_space : TODO
+            TODO
+        subgoal_bounds : TODO
+            TODO
+        project_state_to_subgoal : TODO
+            TODO
+        subgoal_thresholds : TODO
+            TODO
+        max_actions : TODO
+            TODO
+        num_frames_skip : TODO
+            TODO
+        show : TODO
+            TODO
+        """
         self.name = model_name
 
         # Create Mujoco Simulation
@@ -77,9 +160,8 @@ class Environment:
             self.viewer = MjViewer(self.sim)
         self.num_frames_skip = num_frames_skip
 
-    # Get state, which concatenates joint positions and velocities
     def get_state(self):
-
+        """Get state, which concatenates joint positions and velocities."""
         if self.name == "pendulum.xml":
             return np.concatenate(
                 [np.cos(self.sim.data.qpos), np.sin(self.sim.data.qpos),
@@ -88,9 +170,8 @@ class Environment:
         else:
             return np.concatenate((self.sim.data.qpos, self.sim.data.qvel))
 
-    # Reset simulation to state within initial state specified by user
     def reset_sim(self):
-
+        """Reset simulation to state within initial state specified by user."""
         # Reset joint positions and velocities
         for i in range(len(self.sim.data.qpos)):
             self.sim.data.qpos[i] = np.random.uniform(
@@ -106,10 +187,21 @@ class Environment:
         # Return state
         return self.get_state()
 
-    # Execute low-level action for number of frames specified by num_frames_
-    # skip
     def execute_action(self, action):
+        """Execute low-level action.
 
+        This is done for number of frames specified by num_frames_skip.
+
+        Parameters
+        ----------
+        action : TODO
+            TODO
+
+        Returns
+        -------
+        TODO
+            TODO
+        """
         self.sim.data.ctrl[:] = action
         for _ in range(self.num_frames_skip):
             self.sim.step()
@@ -118,17 +210,27 @@ class Environment:
 
         return self.get_state()
 
-    # Visualize end goal.  This function may need to be adjusted for new
-    # environments.
     def display_end_goal(self, end_goal):
+        """Visualize end goal.
 
+        This function may need to be adjusted for new environments.
+
+        Parameters
+        ----------
+        end_goal : TODO
+            TODO
+
+        Raises
+        ------
+        AssertionError
+            TODO
+        """
         # Goal can be visualized by changing the location of the relevant site
         # object.
         if self.name == "pendulum.xml":
             self.sim.data.mocap_pos[0] = np.array(
                 [0.5*np.sin(end_goal[0]), 0, 0.5*np.cos(end_goal[0])+0.6])
         elif self.name == "ur5.xml":
-
             theta_1 = end_goal[0]
             theta_2 = end_goal[1]
             theta_3 = end_goal[2]
@@ -180,14 +282,23 @@ class Environment:
 
             for i in range(3):
                 self.sim.data.mocap_pos[i] = joint_pos[i]
-
         else:
             assert False, \
                 "Provide display end goal function in environment.py file"
 
-    # Function returns an end goal
     def get_next_goal(self, test):
+        """Return an end goal.
 
+        Parameters
+        ----------
+        test : TODO
+            TODO
+
+        Returns
+        -------
+        TODO
+            TODO
+        """
         end_goal = np.zeros((len(self.goal_space_test)))
 
         if self.name == "ur5.xml":
@@ -266,9 +377,14 @@ class Environment:
 
         return end_goal
 
-    # Visualize all subgoals
     def display_subgoals(self, subgoals):
+        """Visualize all subgoals.
 
+        Parameters
+        ----------
+        subgoals : TODO
+            TODO
+        """
         # Display up to 10 subgoals and end goal
         if len(subgoals) <= 11:
             subgoal_ind = 0
@@ -280,12 +396,11 @@ class Environment:
                 self.sim.data.mocap_pos[i] = np.array(
                     [0.5*np.sin(subgoals[subgoal_ind][0]), 0,
                      0.5*np.cos(subgoals[subgoal_ind][0])+0.6])
+
                 # Visualize subgoal
                 self.sim.model.site_rgba[i][3] = 1
                 subgoal_ind += 1
-
             elif self.name == "ur5.xml":
-
                 theta_1 = subgoals[subgoal_ind][0]
                 theta_2 = subgoals[subgoal_ind][1]
                 theta_3 = subgoals[subgoal_ind][2]
@@ -343,8 +458,6 @@ class Environment:
                     self.sim.data.mocap_pos[3 + 3*(i-1) + j] = \
                         np.copy(joint_pos[j])
                     self.sim.model.site_rgba[3 + 3*(i-1) + j][3] = 1
-
-                # print("\nLayer %d Predicted Pos: " % i, wrist_1_pos[:3])
 
                 subgoal_ind += 1
             else:

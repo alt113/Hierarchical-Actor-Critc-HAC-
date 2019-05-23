@@ -4,25 +4,99 @@ from utils import layer
 
 
 class Critic:
+    """TODO
+
+    TODO
+
+    Attributes
+    ----------
+    sess: tf.Session
+        the tensorflow session
+    critic_name : str
+        TODO
+    learning_rate : float
+        critic learning rate TODO
+    gamma : float
+        TODO
+    tau : float
+        TODO
+    q_limit : float
+        TODO
+    goal_dim : float
+        TODO
+    loss_val : float
+        TODO
+    state_dim : float
+        TODO
+    state_ph : tf.placeholder
+        TODO
+    goal_ph : tf.placeholder
+        TODO
+    action_ph : tf.placeholder
+        TODO
+    features_ph : tf.placeholder
+        TODO
+    q_init : float
+        TODO
+    q_offset : float
+        TODO
+    infer : TODO
+        TODO
+    weights : list of TODO
+        TODO
+    target : TODO
+        TODO
+    target_weights : list of TODO
+        TODO
+    update_target_weights : TODO
+        TODO
+    wanted_qs : TODO
+        TODO
+    loss : TODO
+        TODO
+    train : TODO
+        TODO
+    gradient : TODO
+        TODO
+    """
 
     def __init__(self,
                  sess,
                  env,
                  layer_number,
-                 FLAGS,
+                 flags,
                  learning_rate=0.001,
                  gamma=0.98,
                  tau=0.05):
+        """Instantiate the Critic object.
+
+        Parameters
+        ----------
+        sess : tf.Session
+            the tensorflow session
+        env : TODO
+            the environment to train on
+        layer_number : int
+            TODO
+        flags : TODO
+            TODO
+        learning_rate : float
+            TODO
+        gamma : float
+            TODO
+        tau : float
+            TODO
+        """
         self.sess = sess
-        self.critic_name = 'critic_' + str(layer_number)
+        self.critic_name = 'critic_{}'.format(layer_number)
         self.learning_rate = learning_rate
         self.gamma = gamma
         self.tau = tau
 
-        self.q_limit = -FLAGS.time_scale
+        self.q_limit = -flags.time_scale
 
         # Dimensions of goal placeholder will differ depending on layer level
-        if layer_number == FLAGS.layers - 1:
+        if layer_number == flags.layers - 1:
             self.goal_dim = env.end_goal_dim
         else:
             self.goal_dim = env.subgoal_dim
@@ -60,7 +134,7 @@ class Critic:
         # please follow instructions in the "update" method in this file and
         # the "learn" method in the "layer.py" file.
 
-        # Target network code "repurposed" from Patrick Emani :^)
+        # Target network code "re-purposed" from Patrick Emani :^)
         self.target = self.create_nn(self.features_ph,
                                      name=self.critic_name + '_target')
         self.target_weights = \
@@ -81,14 +155,46 @@ class Critic:
 
         self.gradient = tf.gradients(self.infer, self.action_ph)
 
-    def get_Q_value(self, state, goal, action):
+    def get_q_value(self, state, goal, action):
+        """TODO
+
+        Parameters
+        ----------
+        state : TODO
+            TODO
+        goal : TODO
+            TODO
+        action : TODO
+            TODO
+
+        Returns
+        -------
+        TODO
+            TODO
+        """
         return self.sess.run(self.infer, feed_dict={
             self.state_ph: state,
             self.goal_ph: goal,
             self.action_ph: action
         })[0]
 
-    def get_target_Q_value(self, state, goal, action):
+    def get_target_q_value(self, state, goal, action):
+        """TODO
+
+        Parameters
+        ----------
+        state : TODO
+            TODO
+        goal : TODO
+            TODO
+        action : TODO
+            TODO
+
+        Returns
+        -------
+        TODO
+            TODO
+        """
         return self.sess.run(self.target, feed_dict={
             self.state_ph: state,
             self.goal_ph: goal,
@@ -103,7 +209,25 @@ class Critic:
                goals,
                new_actions,
                is_terminals):
+        """TODO
 
+        Parameters
+        ----------
+        old_states : TODO
+            TODO
+        old_actions : TODO
+            TODO
+        rewards : TODO
+            TODO
+        new_states : TODO
+            TODO
+        goals : TODO
+            TODO
+        new_actions : TODO
+            TODO
+        is_terminals : TODO
+            TODO
+        """
         # Be default, repo does not use target networks. To use target
         # networks, comment out "wanted_qs" line directly below and uncomment
         # next "wanted_qs" line.  This will let the Bellman update use
@@ -145,6 +269,22 @@ class Critic:
         })
 
     def get_gradients(self, state, goal, action):
+        """TODO
+
+        Parameters
+        ----------
+        state : TODO
+            TODO
+        goal : TODO
+            TODO
+        action : TODO
+            TODO
+
+        Returns
+        -------
+        TODO
+            TODO
+        """
         grads = self.sess.run(self.gradient, feed_dict={
             self.state_ph: state,
             self.goal_ph: goal,
@@ -153,10 +293,24 @@ class Critic:
 
         return grads[0]
 
-    # Function creates the graph for the critic function. The output uses a
-    # sigmoid, which bounds the Q-values to between [-Policy Length, 0].
     def create_nn(self, features, name=None):
+        """Create the graph for the critic function.
 
+        The output uses a sigmoid, which bounds the Q-values to between
+        [-Policy Length, 0].
+
+        Parameters
+        ----------
+        features : TODO
+            TODO
+        name : str
+            TODO
+
+        Returns
+        -------
+        tf.Variable
+            the output from the critic network.
+        """
         if name is None:
             name = self.critic_name
 

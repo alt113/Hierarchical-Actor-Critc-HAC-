@@ -1,7 +1,29 @@
+"""TODO
+
+TODO
+"""
 import tensorflow as tf
 
 
 def layer(input_layer, num_next_neurons, is_output=False):
+    """TODO
+
+    TODO: describe in more detail.
+
+    Parameters
+    ----------
+    input_layer : tf.placeholder
+        TODO
+    num_next_neurons : TODO
+        TODO
+    is_output : TODO
+        TODO
+
+    Returns
+    -------
+    tf.Variable
+        the output from the neural network layer
+    """
     num_prev_neurons = int(input_layer.shape[1])
     shape = [num_prev_neurons, num_next_neurons]
 
@@ -30,6 +52,22 @@ def layer(input_layer, num_next_neurons, is_output=False):
 
 
 def layer_goal_nn(input_layer, num_next_neurons, is_output=False):
+    """TODO
+
+    Parameters
+    ----------
+    input_layer : TODO
+        TODO
+    num_next_neurons : TODO
+        TODO
+    is_output : bool, optional
+        TODO
+
+    Returns
+    -------
+    tf.Variable
+        TODO
+    """
     num_prev_neurons = int(input_layer.shape[1])
     shape = [num_prev_neurons, num_next_neurons]
 
@@ -52,9 +90,16 @@ def layer_goal_nn(input_layer, num_next_neurons, is_output=False):
     return relu
 
 
-# Below function prints out options and environment specified by user
 def print_summary(flags, env):
+    """Print out options and environment specified by user.
 
+    Parameters
+    ----------
+    flags : TODO
+        TODO
+    env : TODO
+        TODO
+    """
     print("\n---------------------")
     print("Task Summary: ", "\n")
     print("Environment: ", env.name)
@@ -67,7 +112,6 @@ def print_summary(flags, env):
     print("---------------------", "\n\n")
 
 
-# Below function ensures environment configurations were properly entered
 def check_validity(model_name,
                    goal_space_train,
                    goal_space_test,
@@ -77,7 +121,31 @@ def check_validity(model_name,
                    subgoal_thresholds,
                    max_actions,
                    timesteps_per_action):
+    """Ensure environment configurations were properly entered.
 
+    This is done via a sequence of assertions.
+
+    Parameters
+    ----------
+    model_name : TODO
+        TODO
+    goal_space_train : TODO
+        TODO
+    goal_space_test : TODO
+        TODO
+    end_goal_thresholds : TODO
+        TODO
+    initial_state_space : TODO
+        TODO
+    subgoal_bounds : TODO
+        TODO
+    subgoal_thresholds : TODO
+        TODO
+    max_actions : TODO
+        TODO
+    timesteps_per_action : TODO
+        TODO
+    """
     # Ensure model file is an ".xml" file
     assert model_name[-4:] == ".xml", "Mujoco model must be an \".xml\" file"
 

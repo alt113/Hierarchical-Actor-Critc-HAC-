@@ -1,8 +1,58 @@
+"""TODO"""
 import tensorflow as tf
 from utils import layer
 
 
 class Actor:
+    """TODO
+
+    TODO
+
+    Attributes
+    ----------
+    sess : tf.Session
+        the tensorflow session
+    action_space_bounds : TODO
+        TODO
+    action_offset : TODO
+        TODO
+    action_space_size : TODO
+        TODO
+    actor_name : str
+        TODO
+    goal_dim : int
+        TODO
+    state_dim : int
+        TODO
+    tau : float
+        TODO
+    batch_size : int
+        TODO
+    state_ph : tf.placeholder
+        TODO
+    goal_ph : tf.placeholder
+        TODO
+    features_ph : tf.placeholder
+        TODO
+    infer : TODO
+        TODO
+    weights : list of TODO
+        TODO
+    target : TODO
+        the target network
+    target_weights : TODO
+        TODO
+    update_target_weights : TODO
+        TODO
+    action_derivs : TODO
+        TODO
+    unnormalized_actor_gradients : TODO
+        TODO
+    policy_gradient : TODO
+        TODO
+    train : TODO
+        TODO
+    """
 
     def __init__(self,
                  sess,
@@ -12,7 +62,25 @@ class Actor:
                  flags,
                  learning_rate=0.001,
                  tau=0.05):
+        """TODO
 
+        Parameters
+        ----------
+        sess : tf.Session
+            the tensorflow session
+        env : TODO
+            TODO
+        batch_size : TODO
+            TODO
+        layer_number : TODO
+            TODO
+        flags : TODO
+            TODO
+        learning_rate : TODO
+            TODO
+        tau : TODO
+            TODO
+        """
         self.sess = sess
 
         # Determine range of actor network outputs.  This will be used to
@@ -83,18 +151,62 @@ class Actor:
             zip(self.policy_gradient, self.weights))
 
     def get_action(self, state, goal):
+        """TODO
+
+        Parameters
+        ----------
+        state : TODO
+            TODO
+        goal : TODO
+            TODO
+
+        Returns
+        -------
+        TODO
+            TODO
+        """
         return self.sess.run(self.infer, feed_dict={
             self.state_ph: state,
             self.goal_ph: goal
         })
 
     def get_target_action(self, state, goal):
+        """TODO
+
+        Parameters
+        ----------
+        state : TODO
+            TODO
+        goal : TODO
+            TODO
+
+        Returns
+        -------
+        TODO
+            TODO
+        """
         return self.sess.run(self.target, feed_dict={
             self.state_ph: state,
             self.goal_ph: goal
         })
 
     def update(self, state, goal, action_derivs):
+        """TODO
+
+        Parameters
+        ----------
+        state : TODO
+            TODO
+        goal : TODO
+            TODO
+        action_derivs : TODO
+            TODO
+
+        Returns
+        -------
+        TODO
+            TODO
+        """
         weights, policy_grad, _ = self.sess.run(
             [self.weights, self.policy_gradient, self.train], feed_dict={
                 self.state_ph: state,
@@ -106,7 +218,20 @@ class Actor:
         return len(weights)
 
     def create_nn(self, features, name=None):
+        """TODO
 
+        Parameters
+        ----------
+        features : TODO
+            TODO
+        name : str, optional
+            TODO
+
+        Returns
+        -------
+        tf.Variable
+            TODO
+        """
         if name is None:
             name = self.actor_name
 

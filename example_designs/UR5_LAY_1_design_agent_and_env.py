@@ -11,7 +11,7 @@ from utils import check_validity
 from agent import Agent
 
 
-def design_agent_and_env(FLAGS):
+def design_agent_and_env(flags):
 
     """
     1. DESIGN AGENT
@@ -28,14 +28,14 @@ def design_agent_and_env(FLAGS):
     """
 
     # Enter number of levels in agent hierarchy
-    FLAGS.layers = 1
+    flags.layers = 1
 
     # Enter max sequence length in which each policy will specialize
-    FLAGS.time_scale = 600
+    flags.time_scale = 600
 
     # Enter max number of atomic actions.
     #
-    # This will typically be FLAGS.time_scale**(FLAGS.layers). However, in the
+    # This will typically be flags.time_scale**(flags.layers). However, in the
     # UR5 Reacher task, we use a shorter episode length.
     max_actions = 600
 
@@ -180,7 +180,7 @@ def design_agent_and_env(FLAGS):
     # implementation, if a level proposes a subgoal and misses it, the Q target
     # value for this action would be -10.  To incorporate the next state in the
     # penalty, go to the "penalize_subgoal" method in the "layer.py" file.
-    agent_params["subgoal_penalty"] = -FLAGS.time_scale
+    agent_params["subgoal_penalty"] = -flags.time_scale
 
     # Define exploration noise that is added to both subgoal actions and atomic
     # actions.  Noise added is Gaussian N(0, noise_percentage * action_dim_
@@ -211,8 +211,8 @@ def design_agent_and_env(FLAGS):
                       project_state_to_end_goal, end_goal_thresholds,
                       initial_state_space, subgoal_bounds,
                       project_state_to_subgoal, subgoal_thresholds,
-                      max_actions, timesteps_per_action, FLAGS.show)
+                      max_actions, timesteps_per_action, flags.show)
 
-    agent = Agent(FLAGS, env, agent_params)
+    agent = Agent(flags, env, agent_params)
 
     return agent, env

@@ -32,7 +32,7 @@ def design_agent_and_env(flags):
     flags.time_scale = 10
 
     # Enter max number of atomic actions.
-    # This will typically be FLAGS.time_scale**(FLAGS.layers).
+    # This will typically be flags.time_scale**(flags.layers).
     max_actions = flags.time_scale ** flags.layers
 
     # Provide the number of time steps per atomic action.
