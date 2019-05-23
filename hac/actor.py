@@ -1,6 +1,6 @@
 """TODO"""
 import tensorflow as tf
-from utils import layer
+from hac.utils import layer
 
 
 class Actor:

@@ -1,7 +1,7 @@
 import numpy as np
-from experience_buffer import ExperienceBuffer
-from actor import Actor
-from critic import Critic
+from hac.experience_buffer import ExperienceBuffer
+from hac.actor import Actor
+from hac.critic import Critic
 
 
 class Layer:
@@ -334,7 +334,6 @@ class Layer:
 
         transition = [self.current_state, hindsight_action, None, next_state,
                       None, None, hindsight_goal]
-        # print("\nPrelim GR A: ", transition)
 
         self.temp_goal_replay_storage.append(np.copy(transition))
 
@@ -399,9 +398,6 @@ class Layer:
             num_trans, size=num_replay_goals-1)
         indices[num_replay_goals-1] = num_trans - 1
         indices = np.sort(indices)
-
-        # if self.layer_number == 1:
-        #     print("Selected Indices: ", indices)
 
         # For each selected transition, update the goal dimension of the
         # selected transition and all prior transitions by using the next state
@@ -468,6 +464,20 @@ class Layer:
                                attempts_made):
         """Determine whether layer is finished training.
 
+        This method returns to higher level if:
+
+        (i)   a higher level goal has been reached,
+        (ii)  maxed out episode time steps (env.max_actions),
+        (iii) not testing and layer is out of attempts, and
+        (iv)  testing, layer is not the highest level, and layer is out of
+              attempts.
+
+        NOTE: during testing, highest level will continue to ouput subgoals
+        until either
+
+        (i)   the maximum number of episdoe time steps or
+        (ii)  the end goal has been achieved.
+
         Parameters
         ----------
         max_lay_achieved : TODO
@@ -484,18 +494,6 @@ class Layer:
         bool
             TODO
         """
-        # Return to higher level if
-        # (i) a higher level goal has been reached,
-        # (ii) maxed out episode time steps (env.max_actions),
-        # (iii) not testing and layer is out of attempts, and
-        # (iv) testing, layer is not the highest level, and layer is out of
-        #      attempts.
-        #
-        # NOTE: during testing, highest level will continue to ouput subgoals
-        # until either
-        # (i) the maximum number of episdoe time steps or
-        # (ii) the end goal has been achieved.
-
         # Return to previous level when any higher level goal achieved.
         #
         # NOTE: if not testing and agent achieves end goal, training will
@@ -547,8 +545,6 @@ class Layer:
         TODO
             TODO
         """
-        # print("\nTraining Layer %d" % self.layer_number)
-
         # Set layer's current state and new goal state
         self.goal = agent.goal_array[self.layer_number]
         self.current_state = agent.current_state
@@ -631,7 +627,6 @@ class Layer:
 
             # Next, create hindsight transitions if not testing
             if not agent.flags.test:
-
                 # Create action replay transition by evaluating hindsight
                 # action given current goal
                 self.perform_action_replay(

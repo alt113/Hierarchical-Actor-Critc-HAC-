@@ -7,8 +7,8 @@ properly.
 
 import numpy as np
 from environment import Environment
-from utils import check_validity
-from agent import Agent
+from hac.utils import check_validity
+from hac.agent import Agent
 
 
 def design_agent_and_env(flags):

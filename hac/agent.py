@@ -1,5 +1,5 @@
 import numpy as np
-from layer import Layer
+from hac.layer import Layer
 import tensorflow as tf
 import os
 import pickle as cpickle

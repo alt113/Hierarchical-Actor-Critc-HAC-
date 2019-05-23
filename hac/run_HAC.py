@@ -7,7 +7,7 @@ test, the user can enter the command-line options ""--train_only" or "--test",
 respectively. The full list of command-line options is available in the
 "options.py" file.
 """
-from utils import print_summary
+from hac.utils import print_summary
 
 NUM_BATCH = 1000
 TEST_FREQ = 2

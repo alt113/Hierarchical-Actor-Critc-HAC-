@@ -1,6 +1,6 @@
 import tensorflow as tf
 import numpy as np
-from utils import layer
+from hac.utils import layer
 
 
 class Critic:

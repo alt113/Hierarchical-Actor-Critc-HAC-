@@ -1,0 +1,4 @@
+name: hac
+
+dependencies:
+    - python==3.6.7
