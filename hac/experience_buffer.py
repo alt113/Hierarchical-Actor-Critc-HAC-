@@ -75,17 +75,17 @@ class ExperienceBuffer:
         Returns
         -------
         array_like
-            states, of shape [batch_size, state_sim]
+            states, of shape (batch_size, state_sim)
         array_like
-            actions, of shape [batch_size, action_sim]
+            actions, of shape (batch_size, action_sim)
         array_like
-            rewards, of shape [batch_size, 1] TODO: check
+            rewards, of shape (batch_size,)
         array_like
-            next states, of shape [batch_size, state_sim]
+            next states, of shape (batch_size, state_sim)
         array_like
-            goals, of shape [batch_size, goal_sim]
+            goals, of shape (batch_size, goal_sim)
         array_like
-            terminal flags, of shape [batch_size, 1] TODO: check
+            terminal flags, of shape (batch_size,)
         """
         states, actions, rewards, new_states, goals, is_terminals = \
             [], [], [], [], [], []

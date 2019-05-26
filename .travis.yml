@@ -1,0 +1,31 @@
+language: python
+
+python:
+  - "3.6"
+
+sudo: required
+
+install:
+  # Setup conda.
+  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - export PATH="$HOME/miniconda/bin:$PATH"
+
+  # Create conda environment.
+  - conda env create -f environment.yml
+  - source activate hac
+
+  # Other packages to install
+  - pip install flake8 .
+  - pip install coveralls
+  - pip install nose2
+
+before_script:
+  - flake8 --show-source
+
+script:
+  - python setup.py install
+  - nose2 --with-coverage
+
+after_success:
+  - coveralls
