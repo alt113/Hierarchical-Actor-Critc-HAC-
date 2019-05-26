@@ -12,6 +12,23 @@ from hac.agent import Agent
 
 
 def design_agent_and_env(flags):
+    """Instantiate the Agent and Environment classes for training.
+
+    TODO
+
+    Parameters
+    ----------
+    flags : argparse.Namespace
+        the parsed arguments from the command line (see options.py)
+
+    Returns
+    -------
+    hac.Agent
+        the agent class
+    hac.Environment
+        the training environment
+    """
+
     """
     1. DESIGN AGENT
 
@@ -92,8 +109,8 @@ def design_agent_and_env(flags):
 
     # In the UR5 reacher environment, the end goal will be the desired joint
     # positions for the 3 main joints.
-    goal_space_train = [[-np.pi, np.pi], [-np.pi/4, 0], [-np.pi/4, np.pi/4]]
-    goal_space_test = [[-np.pi, np.pi], [-np.pi/4, 0], [-np.pi/4, np.pi/4]]
+    goal_space_train = [(-np.pi, np.pi), (-np.pi/4, 0), (-np.pi/4, np.pi/4)]
+    goal_space_test = [(-np.pi, np.pi), (-np.pi/4, 0), (-np.pi/4, np.pi/4)]
 
     # Provide a function that maps from the state space to the end goal space.
     # This is used to determine whether the agent should be given the sparse
@@ -109,7 +126,7 @@ def design_agent_and_env(flags):
             bounded_angle = -bounded_angle
         return bounded_angle
 
-    def project_state_to_end_goal(sim, state):
+    def project_state_to_end_goal(sim, *_):
         return np.array([bound_angle(sim.data.qpos[i])
                          for i in range(len(sim.data.qpos))])
 
@@ -132,7 +149,7 @@ def design_agent_and_env(flags):
                                [-4, 4]])
 
     # Provide state to subgoal projection function.
-    def project_state_to_subgoal(sim, state):
+    def project_state_to_subgoal(sim, *_):
         return np.concatenate((
             np.array([bound_angle(sim.data.qpos[i])
                       for i in range(len(sim.data.qpos))]),
@@ -180,7 +197,7 @@ def design_agent_and_env(flags):
         # atomic actions.
         # Noise added is Gaussian N(0, noise_percentage * action_dim_range)
         "atomic_noise": [0.1 for _ in range(3)],
-        "subgoal_noise": [0.03 for i in range(6)],
+        "subgoal_noise": [0.03 for _ in range(6)],
 
         # Define number of episodes of transitions to be stored by each level
         # of the hierarchy
@@ -193,7 +210,7 @@ def design_agent_and_env(flags):
         "num_exploration_episodes": 50
     }
 
-    # For other relavent agent hyperparameters, please refer to the "agent.py"
+    # For other relevant agent hyperparameters, please refer to the "agent.py"
     # and "layer.py" files
 
     # Ensure environment customization have been properly entered

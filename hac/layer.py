@@ -1,4 +1,5 @@
 import numpy as np
+from copy import deepcopy
 from hac.experience_buffer import ExperienceBuffer
 from hac.actor import Actor
 from hac.critic import Critic
@@ -12,17 +13,17 @@ class Layer:
     Attributes
     ----------
     layer_number : int
-        TODO
-    flags : TODO
-        TODO
+        the level of the layer (0 being the lowest)
+    flags : argparse.Namespace
+        the parsed arguments from the command line (see options.py)
     sess : tf.Session
         the tensorflow session
     time_limit : TODO
         TODO
-    current_state : TODO
-        TODO
-    goal : TODO
-        TODO
+    current_state : array_like
+        the most recent observation
+    goal : array_like
+        the most recent goal array
     buffer_size_ceiling : int
         ceiling on buffer size
     episodes_to_store : int
@@ -33,17 +34,17 @@ class Layer:
         number of the transitions created for each attempt (i.e, action replay
         + goal replay + subgoal testing)
     buffer_size : int
-        TODO
+        size of the replay buffer
     batch_size : int
-        TODO
-    replay_buffer : TODO
-        TODO
+        SGD batch size
+    replay_buffer : hac.ExperienceBuffer
+        the replay buffer object
     temp_goal_replay_storage : list of TODO
         buffer to store not yet finalized goal replay transitions
-    actor : TODO
-        TODO
-    critic : TODO
-        TODO
+    actor : hac.Actor
+        the actor class
+    critic : hac.Critic
+        the critic class
     noise_perc : TODO
         TODO
     maxed_out : bool
@@ -59,15 +60,15 @@ class Layer:
         Parameters
         ----------
         layer_number : int
-            TODO
-        flags : TODO
-            TODO
-        env : TODO
-            TODO
+            the level of the layer (0 being the lowest)
+        flags : argparse.Namespace
+            the parsed arguments from the command line (see options.py)
+        env : hac.Environment
+            the training environment
         sess : tf.Session
             the tensorflow session
-        agent_params : TODO
-            TODO
+        agent_params : dict
+            agent-specific parameters
         """
         self.layer_number = layer_number
         self.flags = flags
@@ -97,8 +98,8 @@ class Layer:
         # Set number of transitions to serve as replay goals during goal replay
         self.num_replay_goals = 3
 
-        # Number of the transitions created for each attempt (i.e, action
-        # replay + goal replay + subgoal testing)
+        # Number of the transitions created for each attempt
+        # (i.e, action replay + goal replay + subgoal testing)
         if self.layer_number == 0:
             self.trans_per_attempt = \
                 (1 + self.num_replay_goals) * self.time_limit
@@ -145,15 +146,15 @@ class Layer:
 
         Parameters
         ----------
-        action : TODO
-            TODO
-        env : TODO
-            TODO
+        action : hac.Agent
+            the agent class
+        env : hac.Environment
+            the training environment
 
         Returns
         -------
-        TODO
-            TODO
+        array_like
+            the action with noise
         """
         # Noise added will be percentage of range
         if self.layer_number == 0:
@@ -183,13 +184,14 @@ class Layer:
 
         Parameters
         ----------
-        env : TODO
-            TODO
+        env : hac.Environment
+            the training environment
 
         Returns
         -------
-        TODO
-            TODO
+        array_like
+            a random action, within the bounds that are specified in the
+            environment
         """
         if self.layer_number == 0:
             action = np.zeros(env.action_dim)
@@ -214,22 +216,25 @@ class Layer:
 
         Parameters
         ----------
-        agent : TODO
-            TODO
-        env : TODO
-            TODO
-        subgoal_test : TODO
+        agent : hac.Agent
+            the agent class
+        env : hac.Environment
+            the training environment
+        subgoal_test : bool
             TODO
 
         Returns
         -------
-        TODO
-            TODO
+        array_like
+            the action by the agent
+        str
+            the action type, one of: {"Policy", "Noise Policy", "Random"}
+        bool
+            specifies whether to perform evaluation on the next subgoal
         """
         # If testing mode or testing subgoals, action is output of actor
         # network without noise
         if agent.flags.test or subgoal_test:
-
             return self.actor.get_action(
                 np.reshape(self.current_state,
                            (1, len(self.current_state))),
@@ -249,7 +254,6 @@ class Layer:
             # Otherwise, choose random action
             else:
                 action = self.get_random_action(env)
-
                 action_type = "Random"
 
             # Determine whether to test upcoming subgoal
@@ -267,12 +271,12 @@ class Layer:
 
         Parameters
         ----------
-        hindsight_action : TODO
+        hindsight_action : array_like
             TODO
-        next_state : TODO
-            TODO
-        goal_status : TODO
-            TODO
+        next_state : array_like
+            the next observation
+        goal_status : list of bool
+            whether the goal was achieved by each layer
         """
         # Determine reward (0 if goal achieved, -1 otherwise) and finished
         # boolean. The finished boolean is used for determining the target for
@@ -291,7 +295,7 @@ class Layer:
         # print("AR Trans: ", transition)
 
         # Add action replay transition to layer's replay buffer
-        self.replay_buffer.add(np.copy(transition))
+        self.replay_buffer.add(deepcopy(transition))
 
     def create_prelim_goal_replay_trans(self,
                                         hindsight_action,
@@ -318,14 +322,14 @@ class Layer:
 
         Parameters
         ----------
-        hindsight_action : TODO
+        hindsight_action : array_like
             TODO
-        next_state : TODO
-            TODO
-        env : TODO
-            TODO
-        total_layers : TODO
-            TODO
+        next_state : array_like
+            the next observation
+        env : hac.Environment
+            the training environment
+        total_layers : int
+            number of layers in the hierarchical network
         """
         if self.layer_number == total_layers - 1:
             hindsight_goal = env.project_state_to_end_goal(env.sim, next_state)
@@ -342,9 +346,9 @@ class Layer:
 
         Parameters
         ----------
-        new_goal : TODO
+        new_goal : array_like
             TODO
-        hindsight_goal : TODO
+        hindsight_goal : array_like
             TODO
         goal_thresholds : TODO
             TODO
@@ -352,12 +356,13 @@ class Layer:
         Returns
         -------
         float
-            TODO
+            reward value
 
         Raises
         ------
         AssertionError
-            TODO
+            if the goal, hindsight goal, and goal thresholds do not have same
+            dimensions
         """
         assert len(new_goal) == len(hindsight_goal) == len(goal_thresholds), \
             "Goal, hindsight goal, and goal thresholds do not have same " \
@@ -406,9 +411,6 @@ class Layer:
         for i in range(len(indices)):
             trans_copy = np.copy(self.temp_goal_replay_storage)
 
-            # if self.layer_number == 1:
-            #     print("GR Iteration: %d, Index %d" % (i, indices[i]))
-
             new_goal = trans_copy[int(indices[i])][6]
             # for index in range(int(indices[i])+1):
             for index in range(num_trans):
@@ -440,22 +442,23 @@ class Layer:
         """Create transition penalizing subgoal if necessary.
 
         The target Q-value when this transition is used will ignore next state
-        as the finished boolena = True.  Change the finished boolean to False,
+        as the finished boolena = True. Change the finished boolean to False,
         if you would like the subgoal penalty to depend on the next state.
 
         Parameters
         ----------
-        subgoal : TODO
+        subgoal : array_like
             TODO
-        next_state : TODO
+        next_state : array_like
             TODO
-        high_level_goal_achieved : TODO
-            TODO
+        high_level_goal_achieved : bool
+            specifies whether the goal assigned by the layer one level above
+            was achieved
         """
         transition = [self.current_state, subgoal, self.subgoal_penalty,
                       next_state, self.goal, True, None]
 
-        self.replay_buffer.add(np.copy(transition))
+        self.replay_buffer.add(deepcopy(transition))
 
     def return_to_higher_level(self,
                                max_lay_achieved,
@@ -482,10 +485,10 @@ class Layer:
         ----------
         max_lay_achieved : TODO
             TODO
-        agent : TODO
-            TODO
-        env : TODO
-            TODO
+        agent : hac.Agent
+            the agent class
+        env : hac.Environment
+            the training environment
         attempts_made : TODO
             TODO
 
@@ -531,13 +534,13 @@ class Layer:
 
         Parameters
         ----------
-        agent : TODO
+        agent : hac.Agent
+            the agent class
+        env : hac.Environment
+            the training environment
+        subgoal_test : bool, optional
             TODO
-        env : TODO
-            TODO
-        subgoal_test : TODO
-            TODO
-        episode_num : TODO
+        episode_num : int, optional
             TODO
 
         Returns
@@ -563,7 +566,6 @@ class Layer:
         attempts_made = 0
 
         while True:
-
             # Select action to achieve goal state using epsilon-greedy policy
             # or greedy policy if in test mode
             action, action_type, next_subgoal_test = self.choose_action(
@@ -701,12 +703,13 @@ class Layer:
                     return goal_status, max_lay_achieved
 
     def learn(self, num_updates):
-        """Update actor and critic networks.
+        """Update the trainable variables of the actor and critic networks.
 
         Parameters
         ----------
-        num_updates : TODO
-            TODO
+        num_updates : int
+            number of times to compute and apply gradient updates before
+            exiting
         """
         for _ in range(num_updates):
             # Update weights of non-target networks

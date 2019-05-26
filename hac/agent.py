@@ -6,38 +6,39 @@ import pickle as cpickle
 
 
 class Agent:
-    """TODO
+    """Base agent class.
 
     TODO
 
     Attributes
     ----------
-    flags : TODO
-        TODO
+    flags : argparse.Namespace
+        the parsed arguments from the command line (see options.py)
     sess : tf.Session
         the tensorflow session
-    subgoal_test_perc : TODO
+    subgoal_test_perc : float
         subgoal testing ratio each layer will use
-    layers : TODO
-        TODO
-    saver : TODO
-        TODO
-    model_dir : TODO
-        TODO
-    model_loc : TODO
-        TODO
-    goal_array : TODO
-        TODO
-    current_state : TODO
-        TODO
+    layers : list of hac.Layer
+        the layers of the hierarchical policy. Each layer consists of an actor,
+        a critic, and a replay buffer
+    saver : tf.train.Saver
+        saver object used to save network variables
+    model_dir : str
+        directory that checkpoint from the agent will be saved in
+    model_loc : str
+        the path to the checkpoint to be saved
+    goal_array : array_like
+        the most goal array observation
+    current_state : array_like
+        the most recent observation
     steps_taken : int
         number of low-level actions executed
     num_updates : int
         number of Q-value updates made after each episode
-    performance_log : list of TODO
+    performance_log : list of float
         used to store performance results
-    other_params : TODO
-        TODO
+    other_params : dict
+        additional agent parameters
     """
 
     def __init__(self, flags, env, agent_params):
@@ -45,12 +46,12 @@ class Agent:
 
         Parameters
         ----------
-        flags : TODO
-            TODO
-        env : TODO
-            TODO
-        agent_params : TODO
-            TODO
+        flags : argparse.Namespace
+            the parsed arguments from the command line (see options.py)
+        env : hac.Environment
+            the training environment
+        agent_params : dict
+            agent-specific parameters
         """
         self.flags = flags
         self.sess = tf.Session()
@@ -93,13 +94,16 @@ class Agent:
 
         Parameters
         ----------
-        env : TODO
-            TODO
+        env : hac.Environment
+            the training environment
 
         Returns
         -------
-        TODO
-            If applicable, return the highest level whose goal was achieved.
+        list of bool
+            whether the goal was achieved at each layer of the hierarhical
+            network
+        int
+            the highest layer where the goal was achieved
         """
         # goal_status is vector showing status of whether a layer's goal has
         # been achieved
@@ -114,12 +118,10 @@ class Agent:
             env.sim, self.current_state)
 
         for i in range(self.flags.layers):
-
             goal_achieved = True
 
             # If at highest layer, compare to end goal thresholds
             if i == self.flags.layers - 1:
-
                 # Check dimensions are appropriate
                 assert len(proj_end_goal) == len(self.goal_array[i]) == \
                        len(env.end_goal_thresholds), \
@@ -161,7 +163,11 @@ class Agent:
         return goal_status, max_lay_achieved
 
     def initialize_networks(self):
-        """TODO"""
+        """Initialize the variables in all networks.
+
+        If the retrain flag is set to False, the variables are initialized from
+        previous checkpoints located in `self.model_dir`.
+        """
         model_vars = tf.trainable_variables()
         self.saver = tf.train.Saver(model_vars)
 
@@ -184,12 +190,12 @@ class Agent:
     def save_model(self, episode):
         """Save neural network parameters.
 
-        TODO: describe how they are saved
+        These variables are saved by a in a tensorflow checkpoint file.
 
         Parameters
         ----------
-        episode : TODO
-            TODO
+        episode : int
+            global step number
         """
         self.saver.save(self.sess, self.model_loc, global_step=episode)
 
@@ -203,15 +209,15 @@ class Agent:
 
         Parameters
         ----------
-        env : TODO
-            TODO
+        env : hac.Environment
+            the training environment
         episode_num : int
-            TODO
+            episode number since training was initialized
 
         Returns
         -------
-        TODO
-            TODO
+        bool
+            whether the end goal was achieved
         """
         # Select final goal from final goal space, defined in
         # "design_agent_and_env.py"
@@ -222,7 +228,6 @@ class Agent:
         # Select initial state from in initial state space, defined in
         # environment.py
         self.current_state = env.reset_sim()
-        # print("Initial State: ", self.current_state)
 
         # Reset step counter
         self.steps_taken = 0
@@ -238,7 +243,6 @@ class Agent:
         # Return whether end goal was achieved
         return goal_status[self.flags.layers-1]
 
-    # Save performance evaluations
     def log_performance(self, success_rate):
         """Save performance evaluations.
 
@@ -246,8 +250,9 @@ class Agent:
 
         Parameters
         ----------
-        success_rate : TODO
-            TODO
+        success_rate : float
+            the percentage of the episodes that were successful during the
+            evaluation procedure
         """
         # Add latest success_rate to list
         self.performance_log.append(success_rate)

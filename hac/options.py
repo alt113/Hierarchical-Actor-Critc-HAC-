@@ -21,7 +21,7 @@ def parse_options():
 
     Returns
     -------
-    argparse.ArgumentParser
+    argparse.Namespace
         the output parser object
     """
     parser = argparse.ArgumentParser()
@@ -55,6 +55,8 @@ def parse_options():
         action='store_true',
         help='Print summary of each transition'
     )
+
+    # TODO: add the missing options here
 
     flags, unparsed = parser.parse_known_args()
 

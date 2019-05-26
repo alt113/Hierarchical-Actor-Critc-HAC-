@@ -12,21 +12,21 @@ from hac.agent import Agent
 
 
 def design_agent_and_env(flags):
-    """TODO
+    """Instantiate the Agent and Environment classes for training.
 
-    TODO
+    Different examples of this method can be found in example_designs/*.
 
     Parameters
     ----------
-    flags : TODO
-        TODO
+    flags : argparse.Namespace
+        the parsed arguments from the command line (see options.py)
 
     Returns
     -------
-    TODO
-        TODO
-    TODO
-        TODO
+    hac.Agent
+        the agent class
+    hac.Environment
+        the training environment
     """
     # ======================================================================= #
     # Step 1. Design agent                                                    #
@@ -115,8 +115,8 @@ def design_agent_and_env(flags):
 
     # In the UR5 reacher environment, the end goal will be the desired joint
     # positions for the 3 main joints.
-    goal_space_train = [[-np.pi, np.pi], [-np.pi/4, 0], [-np.pi/4, np.pi/4]]
-    goal_space_test = [[-np.pi, np.pi], [-np.pi/4, 0], [-np.pi/4, np.pi/4]]
+    goal_space_train = [(-np.pi, np.pi), (-np.pi/4, 0), (-np.pi/4, np.pi/4)]
+    goal_space_test = [(-np.pi, np.pi), (-np.pi/4, 0), (-np.pi/4, np.pi/4)]
 
     # Provide a function that maps from the state space to the end goal space.
     # This is used to determine whether the agent should be given the sparse
@@ -166,9 +166,6 @@ def design_agent_and_env(flags):
     subgoal_thresholds = np.concatenate(
         (np.array([angle_threshold for _ in range(3)]),
          np.array([velo_threshold for _ in range(3)])))
-
-    # To properly visualize goals, update "display_end_goal" and
-    # "display_subgoals" methods in "environment.py"
 
     # ======================================================================= #
     # Step 3. Set miscellaneous hyperparameters                               #

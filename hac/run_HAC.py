@@ -7,12 +7,9 @@ test, the user can enter the command-line options ""--train_only" or "--test",
 respectively. The full list of command-line options is available in the
 "options.py" file.
 """
-from hac.utils import print_summary
-
 NUM_BATCH = 1000
 TEST_FREQ = 2
-
-num_test_episodes = 100
+NUM_TEST_EPISODES = 100
 
 
 def run_HAC(flags, env, agent):
@@ -22,20 +19,27 @@ def run_HAC(flags, env, agent):
 
     Parameters
     ----------
-    flags : TODO
-        TODO
-    env : TODO
-        TODO
-    agent : TODO
-        TODO
+    flags : argparse.Namespace
+        the parsed arguments from the command line (see options.py)
+    env : hac.Environment
+        the training environment
+    agent : hac.Agent
+        the agent class
     """
-    # TODO: describe what this is
-    num_episodes = agent.other_params["num_exploration_episodes"]
     # Reset successful episode counter
     successful_episodes = 0
 
     # Print task summary
-    print_summary(flags, env)
+    print("\n---------------------")
+    print("Task Summary: ", "\n")
+    print("Environment: ", env.name)
+    print("Number of Layers: ", flags.layers)
+    print("Time Limit per Layer: ", flags.time_scale)
+    print("Max Episode Time Steps: ", env.max_actions)
+    print("Retrain: ", flags.retrain)
+    print("Test: ", flags.test)
+    print("Visualize: ", flags.show)
+    print("---------------------", "\n\n")
 
     # Determine training mode. If not testing and not solely training,
     # interleave training and testing to track progress
@@ -49,7 +53,9 @@ def run_HAC(flags, env, agent):
         if mix_train_test and batch % TEST_FREQ == 0:
             print("\n--- TESTING ---")
             agent.flags.test = True
-            num_episodes = num_test_episodes
+            num_episodes = NUM_TEST_EPISODES
+        else:
+            num_episodes = agent.other_params["num_exploration_episodes"]
 
         for episode in range(num_episodes):
             print("\nBatch %d, Episode %d" % (batch, episode))
@@ -71,7 +77,7 @@ def run_HAC(flags, env, agent):
         # Finish evaluating policy if tested prior batch
         if mix_train_test and batch % TEST_FREQ == 0:
             # Log performance
-            success_rate = successful_episodes / num_test_episodes * 100
+            success_rate = successful_episodes / NUM_TEST_EPISODES * 100
             print("\nTesting Success Rate %.2f%%" % success_rate)
             agent.log_performance(success_rate)
             agent.flags.test = False

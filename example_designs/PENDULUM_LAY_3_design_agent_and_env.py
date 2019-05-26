@@ -12,6 +12,23 @@ from hac.agent import Agent
 
 
 def design_agent_and_env(flags):
+    """Instantiate the Agent and Environment classes for training.
+
+    TODO
+
+    Parameters
+    ----------
+    flags : argparse.Namespace
+        the parsed arguments from the command line (see options.py)
+
+    Returns
+    -------
+    hac.Agent
+        the agent class
+    hac.Environment
+        the training environment
+    """
+
     """
     1. DESIGN AGENT
 
@@ -84,8 +101,8 @@ def design_agent_and_env(flags):
 
     # In the inverted pendulum environment, the end goal will be the desired
     # joint angle and joint velocity for the pendulum.
-    goal_space_train = [[np.deg2rad(-16), np.deg2rad(16)], [-0.6, 0.6]]
-    goal_space_test = [[0, 0], [0, 0]]
+    goal_space_train = [(np.deg2rad(-16), np.deg2rad(16)), (-0.6, 0.6)]
+    goal_space_test = [(0, 0), (0, 0)]
 
     # Provide a function that maps from the state space to the end goal space.
     # This is used to determine whether the agent should be given the sparse

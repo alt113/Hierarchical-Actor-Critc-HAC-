@@ -1,27 +1,24 @@
-"""TODO
-
-TODO
-"""
+"""Utility methods for the training procedure."""
 import tensorflow as tf
 
 
 def layer(input_layer, num_next_neurons, is_output=False):
-    """TODO
-
-    TODO: describe in more detail.
+    """Create a fully connected layer.
 
     Parameters
     ----------
-    input_layer : tf.placeholder
-        TODO
-    num_next_neurons : TODO
-        TODO
-    is_output : TODO
-        TODO
+    input_layer : tf.placeholder or tf.Tensor
+        the input to the neural network layer
+    num_next_neurons : int
+        the number of output elements from this layer
+    is_output : bool, optional
+        specifies whether the current layer is an output layer or not. This
+        affects how the weights and biases of the layer is initialized, and
+        whether a ReLU nonlinearity is added to the output of the layer
 
     Returns
     -------
-    tf.Variable
+    tf.Tensor
         the output from the neural network layer
     """
     num_prev_neurons = int(input_layer.shape[1])
@@ -31,7 +28,6 @@ def layer(input_layer, num_next_neurons, is_output=False):
         weight_init = tf.random_uniform_initializer(minval=-3e-3, maxval=3e-3)
         bias_init = tf.random_uniform_initializer(minval=-3e-3, maxval=3e-3)
     else:
-        # 1/sqrt(f)
         fan_in_init = 1 / num_prev_neurons ** 0.5
         weight_init = tf.random_uniform_initializer(minval=-fan_in_init,
                                                     maxval=fan_in_init)
@@ -51,67 +47,6 @@ def layer(input_layer, num_next_neurons, is_output=False):
     return relu
 
 
-def layer_goal_nn(input_layer, num_next_neurons, is_output=False):
-    """TODO
-
-    Parameters
-    ----------
-    input_layer : TODO
-        TODO
-    num_next_neurons : TODO
-        TODO
-    is_output : bool, optional
-        TODO
-
-    Returns
-    -------
-    tf.Variable
-        TODO
-    """
-    num_prev_neurons = int(input_layer.shape[1])
-    shape = [num_prev_neurons, num_next_neurons]
-
-    fan_in_init = 1 / num_prev_neurons ** 0.5
-    weight_init = tf.random_uniform_initializer(minval=-fan_in_init,
-                                                maxval=fan_in_init)
-    bias_init = tf.random_uniform_initializer(minval=-fan_in_init,
-                                              maxval=fan_in_init)
-
-    weights = tf.get_variable("weights", shape, initializer=weight_init)
-    biases = tf.get_variable("biases", [num_next_neurons],
-                             initializer=bias_init)
-
-    dot = tf.matmul(input_layer, weights) + biases
-
-    if is_output:
-        return dot
-
-    relu = tf.nn.relu(dot)
-    return relu
-
-
-def print_summary(flags, env):
-    """Print out options and environment specified by user.
-
-    Parameters
-    ----------
-    flags : TODO
-        TODO
-    env : TODO
-        TODO
-    """
-    print("\n---------------------")
-    print("Task Summary: ", "\n")
-    print("Environment: ", env.name)
-    print("Number of Layers: ", flags.layers)
-    print("Time Limit per Layer: ", flags.time_scale)
-    print("Max Episode Time Steps: ", env.max_actions)
-    print("Retrain: ", flags.retrain)
-    print("Test: ", flags.test)
-    print("Visualize: ", flags.show)
-    print("---------------------", "\n\n")
-
-
 def check_validity(model_name,
                    goal_space_train,
                    goal_space_test,
@@ -127,24 +62,29 @@ def check_validity(model_name,
 
     Parameters
     ----------
-    model_name : TODO
-        TODO
-    goal_space_train : TODO
-        TODO
-    goal_space_test : TODO
-        TODO
-    end_goal_thresholds : TODO
-        TODO
-    initial_state_space : TODO
-        TODO
-    subgoal_bounds : TODO
-        TODO
-    subgoal_thresholds : TODO
-        TODO
-    max_actions : TODO
-        TODO
-    timesteps_per_action : TODO
-        TODO
+    model_name : str
+        name of the Mujoco model file
+    goal_space_train : list of (float, float)
+        upper and lower bounds of each element of the goal space during
+        training
+    goal_space_test : list of (float, float)
+        upper and lower bounds of each element of the goal space during
+        evaluation
+    end_goal_thresholds : array_like
+        goal achievement thresholds. If the agent is within the threshold for
+        each dimension, the end goal has been achieved and the reward of 0 is
+        granted.
+    initial_state_space : array_like
+        initial values for all elements in the state space
+    subgoal_bounds : array_like
+        range for each dimension of subgoal space
+    subgoal_thresholds : array_like
+        subgoal achievement thresholds
+    max_actions : int
+        maximum number of atomic actions. This will typically be
+        flags.time_scale**(flags.layers).
+    timesteps_per_action : int
+        number of time steps per atomic action
     """
     # Ensure model file is an ".xml" file
     assert model_name[-4:] == ".xml", "Mujoco model must be an \".xml\" file"
@@ -180,7 +120,7 @@ def check_validity(model_name,
     assert len(subgoal_bounds) == len(subgoal_thresholds), \
         "Subgoal space and thresholds must have same first dimension"
 
-    # Ensure max action and timesteps_per_action are postive integers
+    # Ensure max action and timesteps_per_action are positive integers
     assert max_actions > 0, "Max actions should be a positive integer"
 
     assert timesteps_per_action > 0, \

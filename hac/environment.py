@@ -3,60 +3,70 @@ from mujoco_py import load_model_from_path, MjSim, MjViewer
 
 
 class Environment:
-    """TODO
+    """Base environment class.
 
     TODO
 
+    The environment class is adapted to support two environments:
+
+    * UR5: TODO
+    * Pendelum: TODO
+
     Attributes
     ----------
-    name : TODO
-        TODO
+    name : str
+        name of the environment; adopted from the name of the model
     model : TODO
         TODO
-    sim : TODO
+    sim : mujoco_py.MjSim
         TODO
-    state_dim : TODO
-        TODO
-    action_dim : TODO
-        TODO
+    state_dim : int
+        low-level environment observation dimension
+    action_dim : int
+        low-level action dimension
     action_bounds : TODO
         TODO
     action_offset : TODO
         TODO
-    end_goal_dim : TODO
+    end_goal_dim : int
         TODO
-    subgoal_dim : TODO
+    subgoal_dim : int
         TODO
-    subgoal_bounds : TODO
-        TODO
+    subgoal_bounds : array_like
+        range for each dimension of subgoal space
     project_state_to_end_goal : TODO
         TODO
     project_state_to_subgoal : TODO
         TODO
-    subgoal_bounds_symmetric : TODO
+    subgoal_bounds_symmetric : array_like
         TODO
-    subgoal_bounds_offset : TODO
+    subgoal_bounds_offset : array_like
         TODO
-    end_goal_thresholds : TODO
+    end_goal_thresholds : array_like
+        goal achievement thresholds. If the agent is within the threshold for
+        each dimension, the end goal has been achieved and the reward of 0 is
+        granted.
+    subgoal_thresholds : array_like
+        subgoal achievement thresholds
+    initial_state_space : array_like
+        initial values for all elements in the state space
+    goal_space_train : list of (float, float)
+        upper and lower bounds of each element of the goal space during
+        training
+    goal_space_test : list of (float, float)
+        upper and lower bounds of each element of the goal space during
+        evaluation
+    subgoal_colors : list of str
+        colors that are assigned to the subgoal points during visualization
+    max_actions : int
+        maximum number of atomic actions. This will typically be
+        flags.time_scale**(flags.layers).
+    visualize : bool
+        specifies whether to render the environment
+    viewer : mujoco_py.MjViewer
         TODO
-    subgoal_thresholds : TODO
-        TODO
-    initial_state_space : TODO
-        TODO
-    goal_space_train : TODO
-        TODO
-    goal_space_test : TODO
-        TODO
-    subgoal_colors : TODO
-        TODO
-    max_actions : TODO
-        TODO
-    visualize : TODO
-        TODO
-    viewer : TODO
-        TODO
-    num_frames_skip : TODO
-        TODO
+    num_frames_skip : int
+        number of time steps per atomic action
     """
 
     def __init__(self,
@@ -77,29 +87,34 @@ class Environment:
         Parameters
         ----------
         model_name : str
-            TODO
-        goal_space_train : TODO
-            TODO
-        goal_space_test : TODO
-            TODO
+            name of the xml file in './mujoco_files/' that the model is
+            generated from
+        goal_space_train : list of (float, float)
+            upper and lower bounds of each element of the goal space during
+            training
+        goal_space_test : list of (float, float)
+            upper and lower bounds of each element of the goal space during
+            evaluation
         project_state_to_end_goal : TODO
             TODO
-        end_goal_thresholds : TODO
-            TODO
-        initial_state_space : TODO
-            TODO
-        subgoal_bounds : TODO
-            TODO
+        end_goal_thresholds : array_like
+            goal achievement thresholds. If the agent is within the threshold
+            for each dimension, the end goal has been achieved and the reward
+            of 0 is granted.
+        initial_state_space : array_like
+            initial values for all elements in the state space
+        subgoal_bounds : array_like
+            range for each dimension of subgoal space
         project_state_to_subgoal : TODO
             TODO
-        subgoal_thresholds : TODO
-            TODO
-        max_actions : TODO
-            TODO
-        num_frames_skip : TODO
-            TODO
-        show : TODO
-            TODO
+        subgoal_thresholds : array_like
+            subgoal achievement thresholds
+        max_actions : int, optional
+            maximum number of atomic actions. Defaults to 1200.
+        num_frames_skip : int, optional
+            number of time steps per atomic action. Defaults to 10.
+        show : bool, optional
+            specifies whether to render the environment. Defaults to False.
         """
         self.name = model_name
 
@@ -171,7 +186,13 @@ class Environment:
             return np.concatenate((self.sim.data.qpos, self.sim.data.qvel))
 
     def reset_sim(self):
-        """Reset simulation to state within initial state specified by user."""
+        """Reset simulation to state within initial state specified by user.
+
+        Returns
+        -------
+        array_like
+            the initial observation
+        """
         # Reset joint positions and velocities
         for i in range(len(self.sim.data.qpos)):
             self.sim.data.qpos[i] = np.random.uniform(
@@ -194,13 +215,13 @@ class Environment:
 
         Parameters
         ----------
-        action : TODO
-            TODO
+        action : array_like
+            the low level primitive action
 
         Returns
         -------
-        TODO
-            TODO
+        array_like
+            the next observation
         """
         self.sim.data.ctrl[:] = action
         for _ in range(self.num_frames_skip):
@@ -217,13 +238,14 @@ class Environment:
 
         Parameters
         ----------
-        end_goal : TODO
-            TODO
+        end_goal : array_like
+            the desired end goals to be displayed
 
         Raises
         ------
         AssertionError
-            TODO
+            If the goals to be displayed for the given model are not explicitly
+            defined in the method.
         """
         # Goal can be visualized by changing the location of the relevant site
         # object.
@@ -241,44 +263,37 @@ class Environment:
             wrist_1_pos_4 = np.array([0.39225, -0.1197, 0, 1])
 
             # Transformation matrix from shoulder to base reference frame
-            T_1_0 = np.array([[1, 0, 0, 0],
+            t_1_0 = np.array([[1, 0, 0, 0],
                               [0, 1, 0, 0],
                               [0, 0, 1, 0.089159],
                               [0, 0, 0, 1]])
 
             # Transformation matrix from upper arm to shoulder reference frame
-            T_2_1 = np.array([[np.cos(theta_1), -np.sin(theta_1), 0, 0],
+            t_2_1 = np.array([[np.cos(theta_1), -np.sin(theta_1), 0, 0],
                               [np.sin(theta_1), np.cos(theta_1), 0, 0],
                               [0, 0, 1, 0],
                               [0, 0, 0, 1]])
 
             # Transformation matrix from forearm to upper arm reference frame
-            T_3_2 = np.array([[np.cos(theta_2), 0, np.sin(theta_2), 0],
+            t_3_2 = np.array([[np.cos(theta_2), 0, np.sin(theta_2), 0],
                               [0, 1, 0, 0.13585],
                               [-np.sin(theta_2), 0, np.cos(theta_2), 0],
                               [0, 0, 0, 1]])
 
             # Transformation matrix from wrist 1 to forearm reference frame
-            T_4_3 = np.array([[np.cos(theta_3), 0, np.sin(theta_3), 0.425],
+            t_4_3 = np.array([[np.cos(theta_3), 0, np.sin(theta_3), 0.425],
                               [0, 1, 0, 0],
                               [-np.sin(theta_3), 0, np.cos(theta_3), 0],
                               [0, 0, 0, 1]])
 
             # Determine joint position relative to original reference frame
             # shoulder_pos = T_1_0.dot(shoulder_pos_1)
-            upper_arm_pos = T_1_0.dot(T_2_1).dot(upper_arm_pos_2)[:3]
-            forearm_pos = T_1_0.dot(T_2_1).dot(T_3_2).dot(forearm_pos_3)[:3]
-            wrist_1_pos = T_1_0.dot(T_2_1).dot(T_3_2).dot(T_4_3).dot(
+            upper_arm_pos = t_1_0.dot(t_2_1).dot(upper_arm_pos_2)[:3]
+            forearm_pos = t_1_0.dot(t_2_1).dot(t_3_2).dot(forearm_pos_3)[:3]
+            wrist_1_pos = t_1_0.dot(t_2_1).dot(t_3_2).dot(t_4_3).dot(
                 wrist_1_pos_4)[:3]
 
             joint_pos = [upper_arm_pos, forearm_pos, wrist_1_pos]
-
-            """
-            print("\nEnd Goal Joint Pos: ")
-            print("Upper Arm Pos: ", joint_pos[0])
-            print("Forearm Pos: ", joint_pos[1])
-            print("Wrist Pos: ", joint_pos[2])
-            """
 
             for i in range(3):
                 self.sim.data.mocap_pos[i] = joint_pos[i]
@@ -291,18 +306,17 @@ class Environment:
 
         Parameters
         ----------
-        test : TODO
-            TODO
+        test : bool
+            False if training, True if performing evaluations
 
         Returns
         -------
-        TODO
+        array_like
             TODO
         """
         end_goal = np.zeros((len(self.goal_space_test)))
 
         if self.name == "ur5.xml":
-
             goal_possible = False
             while not goal_possible:
                 end_goal = np.zeros(shape=(self.end_goal_dim,))
@@ -382,8 +396,8 @@ class Environment:
 
         Parameters
         ----------
-        subgoals : TODO
-            TODO
+        subgoals : array_like
+            the subgoals to be displayed (e.g. desired positions)
         """
         # Display up to 10 subgoals and end goal
         if len(subgoals) <= 11:
@@ -445,13 +459,6 @@ class Environment:
                     wrist_1_pos_4)[:3]
 
                 joint_pos = [upper_arm_pos, forearm_pos, wrist_1_pos]
-
-                """
-                print("\nSubgoal %d Joint Pos: " % i)
-                print("Upper Arm Pos: ", joint_pos[0])
-                print("Forearm Pos: ", joint_pos[1])
-                print("Wrist Pos: ", joint_pos[2])
-                """
 
                 # Designate site position for upper arm, forearm and wrist
                 for j in range(3):

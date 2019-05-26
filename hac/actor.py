@@ -1,10 +1,10 @@
-"""TODO"""
+"""Contains the Actor object."""
 import tensorflow as tf
 from hac.utils import layer
 
 
 class Actor:
-    """TODO
+    """Base actor class.
 
     TODO
 
@@ -16,42 +16,48 @@ class Actor:
         TODO
     action_offset : TODO
         TODO
-    action_space_size : TODO
-        TODO
+    action_space_size : int
+        dimension of the action space by the actor class. Set to the
+        environment action dimension if at the lowest level of the hierarchy,
+        and to the sub_goal dimension if you are at higher levels.
     actor_name : str
-        TODO
+        the default base term within the scope of the actor components in the
+        computation graph
     goal_dim : int
-        TODO
+        number of elements in the goal vector
     state_dim : int
-        TODO
+        number of elements in the environment states
     tau : float
-        TODO
+        actor target update rate
     batch_size : int
-        TODO
+        SGD batch size
     state_ph : tf.placeholder
-        TODO
+        placeholder for the environment states
     goal_ph : tf.placeholder
-        TODO
+        placeholder from the goals that are provided from the layer that is one
+        level above the current layer
     features_ph : tf.placeholder
-        TODO
-    infer : TODO
-        TODO
-    weights : list of TODO
-        TODO
-    target : TODO
-        the target network
-    target_weights : TODO
-        TODO
-    update_target_weights : TODO
-        TODO
-    action_derivs : TODO
+        feature placeholder, consisting of the placeholders for the states and
+        goals
+    infer : tf.Tensor
+        the actor network
+    weights : list of tf.Variable
+        trainable parameters of the actor network
+    target : tf.Tensor
+        the target actor network
+    target_weights : list of tf.Variable
+        trainable parameters of the target actor network
+    update_target_weights : list of tf.Operation
+        the processes that are used to perform soft target updates
+    action_derivs : tf.placeholder
         TODO
     unnormalized_actor_gradients : TODO
         TODO
     policy_gradient : TODO
         TODO
-    train : TODO
-        TODO
+    train : tf.Operation
+        a tensorflow operation for applying the gradients to the parameters of
+        the critic
     """
 
     def __init__(self,
@@ -62,24 +68,24 @@ class Actor:
                  flags,
                  learning_rate=0.001,
                  tau=0.05):
-        """TODO
+        """Instantiate the Actor object.
 
         Parameters
         ----------
         sess : tf.Session
             the tensorflow session
-        env : TODO
-            TODO
-        batch_size : TODO
-            TODO
-        layer_number : TODO
-            TODO
-        flags : TODO
-            TODO
-        learning_rate : TODO
-            TODO
-        tau : TODO
-            TODO
+        env : hac.Environment
+            the training environment
+        batch_size : int
+            SGD batch size
+        layer_number : int
+            the level of the layer (0 being the lowest)
+        flags : argparse.Namespace
+            the parsed arguments from the command line (see options.py)
+        learning_rate : float, optional
+            actor learning rate. Defaults to 0.001
+        tau : float, optional
+            actor target update rate. Defaults to 0.05
         """
         self.sess = sess
 
@@ -99,7 +105,7 @@ class Actor:
         else:
             self.action_space_size = env.subgoal_dim
 
-        self.actor_name = 'actor_' + str(layer_number)
+        self.actor_name = 'actor_{}'.format(layer_number)
 
         # Dimensions of goal placeholder will differ depending on layer level
         if layer_number == flags.layers - 1:
@@ -122,7 +128,7 @@ class Actor:
         # Create actor network
         self.infer = self.create_nn(self.features_ph)
 
-        # Target network code "repurposed" from Patrick Emani :^)
+        # Target network code "re-purposed" from Patrick Emani :^)
         self.weights = [v for v in tf.trainable_variables()
                         if self.actor_name in v.op.name]
         # self.num_weights = len(self.weights)
@@ -151,19 +157,19 @@ class Actor:
             zip(self.policy_gradient, self.weights))
 
     def get_action(self, state, goal):
-        """TODO
+        """Compute the action.
 
         Parameters
         ----------
-        state : TODO
-            TODO
-        goal : TODO
-            TODO
+        state : array_like
+            observation array
+        goal : array_like
+            goal array
 
         Returns
         -------
-        TODO
-            TODO
+        array_like
+            the output action
         """
         return self.sess.run(self.infer, feed_dict={
             self.state_ph: state,
@@ -171,19 +177,19 @@ class Actor:
         })
 
     def get_target_action(self, state, goal):
-        """TODO
+        """Compute the action from the target network.
 
         Parameters
         ----------
-        state : TODO
-            TODO
-        goal : TODO
-            TODO
+        state : array_like
+            observation array
+        goal : array_like
+            goal array
 
         Returns
         -------
-        TODO
-            TODO
+        array_like
+            the output action
         """
         return self.sess.run(self.target, feed_dict={
             self.state_ph: state,
@@ -191,21 +197,21 @@ class Actor:
         })
 
     def update(self, state, goal, action_derivs):
-        """TODO
+        """Perform an gradient update step to the weights of the actor network.
 
         Parameters
         ----------
-        state : TODO
-            TODO
-        goal : TODO
-            TODO
+        state : array_like
+            observation array
+        goal : array_like
+            goal array
         action_derivs : TODO
             TODO
 
         Returns
         -------
-        TODO
-            TODO
+        int
+            the number of trainable variables
         """
         weights, policy_grad, _ = self.sess.run(
             [self.weights, self.policy_gradient, self.train], feed_dict={
@@ -218,19 +224,21 @@ class Actor:
         return len(weights)
 
     def create_nn(self, features, name=None):
-        """TODO
+        """Create the graph for the actor function.
 
         Parameters
         ----------
-        features : TODO
-            TODO
+        features : tf.placeholder
+            the input (feature) placeholder
         name : str, optional
-            TODO
+            the base term within the scope of the actor components in the
+            computation graph. Defaults to the `actor_name` variable within
+            the class.
 
         Returns
         -------
-        tf.Variable
-            TODO
+        tf.Tensor
+            the output from the actor network
         """
         if name is None:
             name = self.actor_name

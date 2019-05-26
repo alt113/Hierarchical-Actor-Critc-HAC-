@@ -5,18 +5,16 @@ import numpy as np
 class ExperienceBuffer:
     """Experience replay buffer object.
 
-    TODO
-
     Attributes
     ----------
     size : int
         the current number of samples in the replay buffer
     max_buffer_size : int
         the maximum number of elements allowed to be in the buffer
-    experiences : list of list
-        list of element samples, stored (by index) as follows:
-
-        * TODO
+    experiences : dict  TODO: convert to this
+        list of element samples, stored in array_like format, with the
+        following keys: "state", "action", "next_state", "goal", "reward", and
+        "is_terminal"
     batch_size : int
         the number of elements to be returned whenever `get_batch` is called
     """
@@ -27,9 +25,10 @@ class ExperienceBuffer:
         Parameters
         ----------
         max_buffer_size : int
-            TODO
+            the maximum number of elements allowed to be in the buffer
         batch_size : int
-            TODO
+            the number of elements to be returned whenever `get_batch` is
+            called
         """
         self.size = 0
         self.max_buffer_size = max_buffer_size
@@ -45,19 +44,20 @@ class ExperienceBuffer:
 
         Parameters
         ----------
-        experience : TODO
-            TODO
+        experience : list
+            A new sample element, consisting of the following terms, in order:
+            [state, action, reward, next_state, goal, terminal, grip_info]
 
         Raises
         ------
         AssertionError
-            TODO
+            If the sample does not contain 7 elements.
         AssertionError
-            TODO
+            If the sixth element is not a boolean term
         """
         assert len(experience) == 7, \
             'Experience must be of form (s, a, r, s, g, t, grip_info\')'
-        assert type(experience[5]) == bool
+        assert isinstance(experience[5], bool)
 
         self.experiences.append(experience)
         self.size += 1
@@ -70,12 +70,22 @@ class ExperienceBuffer:
             self.size -= beg_index
 
     def get_batch(self):
-        """TODO
+        """Return a batch of samples.
 
         Returns
         -------
-        TODO
-            TODO
+        array_like
+            states, of shape [batch_size, state_sim]
+        array_like
+            actions, of shape [batch_size, action_sim]
+        array_like
+            rewards, of shape [batch_size, 1] TODO: check
+        array_like
+            next states, of shape [batch_size, state_sim]
+        array_like
+            goals, of shape [batch_size, goal_sim]
+        array_like
+            terminal flags, of shape [batch_size, 1] TODO: check
         """
         states, actions, rewards, new_states, goals, is_terminals = \
             [], [], [], [], [], []

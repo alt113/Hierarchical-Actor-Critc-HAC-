@@ -4,7 +4,7 @@ from hac.utils import layer
 
 
 class Critic:
-    """TODO
+    """Base critic class.
 
     TODO
 
@@ -13,49 +13,54 @@ class Critic:
     sess: tf.Session
         the tensorflow session
     critic_name : str
-        TODO
+        the default base term within the scope of the critic components in the
+        computation graph
     learning_rate : float
-        critic learning rate TODO
+        critic learning rate
     gamma : float
-        TODO
+        critic discount factor
     tau : float
-        TODO
+        critic target update rate
     q_limit : float
-        TODO
-    goal_dim : float
-        TODO
+        largest valid value by the Q-function
+    goal_dim : int
+        number of elements in the goal vector
     loss_val : float
-        TODO
-    state_dim : float
-        TODO
+        the most recent value from the loss function
+    state_dim : int
+        number of elements in the environment states
     state_ph : tf.placeholder
-        TODO
+        placeholder for the environment states
     goal_ph : tf.placeholder
-        TODO
+        placeholder from the goals that are provided from the layer that is one
+        level above the current layer
     action_ph : tf.placeholder
-        TODO
+        placeholder for the actions performed by the current layer
     features_ph : tf.placeholder
-        TODO
+        feature placeholder, consisting of the placeholders for the states,
+        goals, and actions
     q_init : float
-        TODO
+        Initial Q values
     q_offset : float
-        TODO
-    infer : TODO
-        TODO
-    weights : list of TODO
-        TODO
-    target : TODO
-        TODO
-    target_weights : list of TODO
-        TODO
-    update_target_weights : TODO
-        TODO
+        an offset term to the Q function. This critic optimistic initialization
+        near q_init
+    infer : tf.Tensor
+        the critic network
+    weights : list of of tf.Variable
+        the trainable variables of the critic network
+    target : tf.Tensor
+        the target critic network
+    target_weights : list of of tf.Variable
+        the trainable variables of the target critic network
+    update_target_weights : list of tf.Operation
+        the processes that are used to perform soft target updates
     wanted_qs : TODO
         TODO
-    loss : TODO
-        TODO
-    train : TODO
-        TODO
+    loss : tf.Tensor
+        the loss function
+    train : tf.Operation
+        a tensorflow operation for applying the gradients to the parameters of
+        the critic
     gradient : TODO
         TODO
     """
@@ -74,18 +79,18 @@ class Critic:
         ----------
         sess : tf.Session
             the tensorflow session
-        env : TODO
-            the environment to train on
+        env : hac.Environment
+            the training environment
         layer_number : int
-            TODO
-        flags : TODO
-            TODO
+            the level of the layer (0 being the lowest)
+        flags : argparse.Namespace
+            the parsed arguments from the command line (see options.py)
         learning_rate : float
-            TODO
+            critic learning rate
         gamma : float
-            TODO
+            critic discount factor
         tau : float
-            TODO
+            critic target update rate
         """
         self.sess = sess
         self.critic_name = 'critic_{}'.format(layer_number)
@@ -156,21 +161,21 @@ class Critic:
         self.gradient = tf.gradients(self.infer, self.action_ph)
 
     def get_q_value(self, state, goal, action):
-        """TODO
+        """Compute the Q-value.
 
         Parameters
         ----------
-        state : TODO
-            TODO
-        goal : TODO
-            TODO
-        action : TODO
-            TODO
+        state : array_like
+            observation array
+        goal : array_like
+            goal array
+        action : array_like
+            action array
 
         Returns
         -------
-        TODO
-            TODO
+        float
+            the output Q-value
         """
         return self.sess.run(self.infer, feed_dict={
             self.state_ph: state,
@@ -179,21 +184,21 @@ class Critic:
         })[0]
 
     def get_target_q_value(self, state, goal, action):
-        """TODO
+        """Compute the Q-value from the target network.
 
         Parameters
         ----------
-        state : TODO
-            TODO
-        goal : TODO
-            TODO
-        action : TODO
-            TODO
+        state : array_like
+            observation array
+        goal : array_like
+            goal array
+        action : array_like
+            action array
 
         Returns
         -------
-        TODO
-            TODO
+        float
+            the output Q-value
         """
         return self.sess.run(self.target, feed_dict={
             self.state_ph: state,
@@ -213,19 +218,19 @@ class Critic:
 
         Parameters
         ----------
-        old_states : TODO
+        old_states : array_like
             TODO
-        old_actions : TODO
+        old_actions : array_like
             TODO
-        rewards : TODO
+        rewards : array_like
             TODO
-        new_states : TODO
+        new_states : array_like
             TODO
-        goals : TODO
+        goals : array_like
             TODO
-        new_actions : TODO
+        new_actions : array_like
             TODO
-        is_terminals : TODO
+        is_terminals : array_like
             TODO
         """
         # Be default, repo does not use target networks. To use target
@@ -269,21 +274,21 @@ class Critic:
         })
 
     def get_gradients(self, state, goal, action):
-        """TODO
+        """Compute the gradients for the critic w.r.t. the loss function.
 
         Parameters
         ----------
-        state : TODO
-            TODO
-        goal : TODO
-            TODO
-        action : TODO
-            TODO
+        state : array_like
+            observation array
+        goal : array_like
+            goal array
+        action : array_like
+            action array
 
         Returns
         -------
-        TODO
-            TODO
+        array_like
+            the gradient values for each trainable variable
         """
         grads = self.sess.run(self.gradient, feed_dict={
             self.state_ph: state,
@@ -291,7 +296,7 @@ class Critic:
             self.action_ph: action
         })
 
-        return grads[0]
+        return grads[0]  # TODO: why bother? Isn't this slower?
 
     def create_nn(self, features, name=None):
         """Create the graph for the critic function.
@@ -301,15 +306,17 @@ class Critic:
 
         Parameters
         ----------
-        features : TODO
-            TODO
-        name : str
-            TODO
+        features : tf.placeholder
+            the input (feature) placeholder
+        name : str, optional
+            the base term within the scope of the critic components in the
+            computation graph. Defaults to the `critic_name` variable within
+            the class.
 
         Returns
         -------
-        tf.Variable
-            the output from the critic network.
+        tf.Tensor
+            the output from the critic network
         """
         if name is None:
             name = self.critic_name

@@ -6,12 +6,29 @@ properly.
 """
 
 import numpy as np
-from environment import Environment
+from hac.environment import Environment
 from hac.utils import check_validity
 from hac.agent import Agent
 
 
 def design_agent_and_env(flags):
+    """Instantiate the Agent and Environment classes for training.
+
+    TODO
+
+    Parameters
+    ----------
+    flags : argparse.Namespace
+        the parsed arguments from the command line (see options.py)
+
+    Returns
+    -------
+    hac.Agent
+        the agent class
+    hac.Environment
+        the training environment
+    """
+
     """
     1. DESIGN AGENT
 
@@ -112,9 +129,9 @@ def design_agent_and_env(flags):
     end_goal_thresholds = np.array([np.deg2rad(9.5), 0.6])
 
     # Provide range for each dimension of subgoal space in order to configure
-    # subgoal actor networks.  Subgoal space can be the same as the state space
-    # or some other projection out of the state space.  In our implementation
-    # of the inverted pendulum task, the subgoal space is the concatenation
+    # subgoal actor networks. Subgoal space can be the same as the state space
+    # or some other projection out of the state space. In our implementation of
+    # the inverted pendulum task, the subgoal space is the concatenation
     # pendulum position and velocity. This is slightly different than the state
     # space, which is
     # [cos(pendulum angle), sin(pendulum angle), pendulum velocity].
