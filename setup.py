@@ -1,6 +1,15 @@
+import os
 from os.path import dirname, realpath
 from setuptools import find_packages, setup
 from hac.version import __version__
+
+
+# This is used to install MuJoCo only when outside the travis build.
+test_flag = os.environ.get('TEST_FLAG', "False")
+if test_flag == "False":
+    extras = {'all': ['mujoco-py<2.1,>=2.0']}
+else:
+    extras = {'all': []}
 
 
 def _read_requirements_file():
@@ -19,5 +28,5 @@ setup(
     url="https://github.com/AboudyKreidieh/hac",
     keywords="hierarchical-reinforcement-learning deep-learning python",
     install_requires=_read_requirements_file(),
-    zip_safe=False,
+    extras_require=extras,
 )
