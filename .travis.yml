@@ -6,6 +6,10 @@ python:
 sudo: required
 
 install:
+  # Get a version of MuJoCo up
+  - mkdir -p ~/.mujoco
+  - curl https://openai-public.s3-us-west-2.amazonaws.com/mujoco/$MUJOCO_KEY_BUNDLE.tar.gz | tar xz -C ~/.mujoco
+
   # Setup conda.
   - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
   - bash miniconda.sh -b -p $HOME/miniconda
