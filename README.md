@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.com/AboudyKreidieh/Hierarchical-Actor-Critc-HAC-.svg?branch=master)](https://travis-ci.com/AboudyKreidieh/Hierarchical-Actor-Critc-HAC-)
+[![Coverage Status](https://coveralls.io/repos/github/AboudyKreidieh/Hierarchical-Actor-Critc-HAC-/badge.svg?branch=master)](https://coveralls.io/github/AboudyKreidieh/Hierarchical-Actor-Critc-HAC-?branch=master)
+
 # Hierarchical Actor-Critc (HAC)
 This repository contains the code to implement the *Hierarchical Actor-Critic (HAC)* algorithm.  HAC helps agents learn tasks more quickly by enabling them to break problems down into short sequences of actions.  The paper describing the algorithm is available [here](https://arxiv.org/abs/1712.00948).
 
