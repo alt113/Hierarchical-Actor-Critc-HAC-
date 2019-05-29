@@ -42,9 +42,8 @@ def layer(input_layer, num_next_neurons, is_output=False):
 
     if is_output:
         return dot
-
-    relu = tf.nn.relu(dot)
-    return relu
+    else:
+        return tf.nn.relu(dot)
 
 
 def check_validity(model_name,
