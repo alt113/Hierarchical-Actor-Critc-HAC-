@@ -1,11 +1,29 @@
 import unittest
+from hac.options import parse_options
 
 
 class TestOptions(unittest.TestCase):
     """Tests for the parser method in options.py."""
 
     def test_parse_options(self):
-        pass
+        # Part 1. Test the options that store true
+        options = parse_options(args=[])
+        self.assertFalse(options.retrain)
+        self.assertFalse(options.show)
+        self.assertFalse(options.train_only)
+        self.assertFalse(options.verbose)
+
+        options = parse_options(args=['--retrain'])
+        self.assertTrue(options.retrain)
+
+        options = parse_options(args=['--show'])
+        self.assertTrue(options.show)
+
+        options = parse_options(args=['--train_only'])
+        self.assertTrue(options.train_only)
+
+        options = parse_options(args=['--verbose'])
+        self.assertTrue(options.verbose)
 
 
 if __name__ == '__main__':

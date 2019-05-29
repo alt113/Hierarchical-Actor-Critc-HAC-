@@ -2,22 +2,25 @@
 import argparse
 
 
-def parse_options():
+def parse_options(args):
     """Parse training options user can specify in command line.
 
-    Options Include:
+    Parameters
+    ----------
+    args : list of str
+        Arguments to be parsed by this method. These arguments include:
 
-    * --retrain (boolean): If included, actor and critic neural network
-      parameters are reset.
-    * --test (boolean): If included, agent only uses greedy policy without
-      noise. No changes are made to policy and neural networks. If not
-      included, periods of training are by default interleaved with periods of
-      testing to evaluate progress.
-    * show (boolean): If included, training will be visualized.
-    * --train_only (boolean): If included, agent will be solely in training
-      mode and will not interleave periods of training and testing.
-    * --verbose (boolean): If included, summary of each transition will be
-      printed.
+        * --retrain (boolean): If included, actor and critic neural network
+          parameters are reset.
+        * --test (boolean): If included, agent only uses greedy policy without
+          noise. No changes are made to policy and neural networks. If not
+          included, periods of training are by default interleaved with periods
+          of testing to evaluate progress.
+        * show (boolean): If included, training will be visualized.
+        * --train_only (boolean): If included, agent will be solely in training
+          mode and will not interleave periods of training and testing.
+        * --verbose (boolean): If included, summary of each transition will be
+          printed.
 
     Returns
     -------
@@ -58,6 +61,6 @@ def parse_options():
 
     # TODO: add the missing options here
 
-    flags, unparsed = parser.parse_known_args()
+    flags, unparsed = parser.parse_known_args(args)
 
     return flags
