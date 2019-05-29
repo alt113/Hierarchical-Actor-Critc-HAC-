@@ -56,7 +56,7 @@ class ExperienceBuffer:
             If the sixth element is not a boolean term
         """
         assert len(experience) == 7, \
-            'Experience must be of form (s, a, r, s, g, t, grip_info\')'
+            'Experience must be of form (s, a, r, s, g, t, grip_info)'
         assert isinstance(experience[5], bool)
 
         self.experiences.append(experience)

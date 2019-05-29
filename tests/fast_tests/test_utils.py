@@ -34,7 +34,7 @@ class TestUtils(unittest.TestCase):
         # tests the shapes and that the ReLU worked
         self.assertEqual(out1.shape, (2, 5))
         self.assertEqual(out2.shape, (2, 1))
-        self.assertTrue((out2 > 0).all())
+        self.assertTrue((out2 >= 0).all())
 
     def test_check_validity(self):
         bad_model_name = "bad"
