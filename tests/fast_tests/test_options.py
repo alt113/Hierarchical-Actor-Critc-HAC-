@@ -6,12 +6,13 @@ class TestOptions(unittest.TestCase):
     """Tests for the parser method in options.py."""
 
     def test_parse_options(self):
-        # Part 1. Test the options that store true
         options = parse_options(args=[])
         self.assertFalse(options.retrain)
         self.assertFalse(options.show)
         self.assertFalse(options.train_only)
         self.assertFalse(options.verbose)
+        self.assertEqual(options.layers, 1)
+        self.assertEqual(options.time_scale, 10)
 
         options = parse_options(args=['--retrain'])
         self.assertTrue(options.retrain)
@@ -24,6 +25,12 @@ class TestOptions(unittest.TestCase):
 
         options = parse_options(args=['--verbose'])
         self.assertTrue(options.verbose)
+
+        options = parse_options(args=['--layers', '2'])
+        self.assertEqual(options.layers, 2)
+
+        options = parse_options(args=['--time_scale', '100'])
+        self.assertEqual(options.time_scale, 100)
 
 
 if __name__ == '__main__':

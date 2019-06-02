@@ -42,9 +42,11 @@ def design_agent_and_env(flags):
     See Section 3 of this file for other agent hyperparameters that can be
     configured.
     """
+    # TODO: move to runner command
     # Enter number of levels in agent hierarchy
     flags.layers = 3
 
+    # TODO: move to runner command
     # Enter max sequence length in which each policy will specialize
     flags.time_scale = 10
 

@@ -43,9 +43,11 @@ def design_agent_and_env(flags):
     configured.
     """
 
+    # TODO: move to runner command
     # Enter number of levels in agent hierarchy
     flags.layers = 1
 
+    # TODO: move to runner command
     # Enter max sequence length in which each policy will specialize
     flags.time_scale = 1000
 
@@ -102,8 +104,8 @@ def design_agent_and_env(flags):
 
     # In the inverted pendulum environment, the end goal will be the desired
     # joint angle and joint velocity for the pendulum.
-    goal_space_train = [[np.deg2rad(-16), np.deg2rad(16)], [-0.6, 0.6]]
-    goal_space_test = [[0, 0], [0, 0]]
+    goal_space_train = [(np.deg2rad(-16), np.deg2rad(16)), (-0.6, 0.6)]
+    goal_space_test = [(0, 0), (0, 0)]
 
     # Provide a function that maps from the state space to the end goal space.
     # This is used to determine whether the agent should be given the sparse
@@ -113,10 +115,8 @@ def design_agent_and_env(flags):
     # Supplemental function that converts angle to between [-pi,pi]
     def bound_angle(angle):
         bounded_angle = angle % (2*np.pi)
-
         if np.absolute(bounded_angle) > np.pi:
             bounded_angle = -(np.pi - bounded_angle % np.pi)
-
         return bounded_angle
 
     def project_state_to_end_goal(sim, state):
