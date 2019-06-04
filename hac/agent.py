@@ -100,7 +100,7 @@ class Agent:
         Returns
         -------
         list of bool
-            whether the goal was achieved at each layer of the hierarhical
+            whether the goal was achieved at each layer of the hierarchical
             network
         int
             the highest layer where the goal was achieved
@@ -138,7 +138,6 @@ class Agent:
 
             # If not highest layer, compare to subgoal thresholds
             else:
-
                 # Check that dimensions are appropriate
                 assert len(proj_subgoal) == len(self.goal_array[i]) == \
                        len(env.subgoal_thresholds), \
@@ -227,7 +226,7 @@ class Agent:
 
         # Select initial state from in initial state space, defined in
         # environment.py
-        self.current_state = env.reset_sim()
+        self.current_state = env.reset()
 
         # Reset step counter
         self.steps_taken = 0

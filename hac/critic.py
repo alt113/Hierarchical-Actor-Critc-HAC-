@@ -29,8 +29,8 @@ class Critic:
         the most recent value from the loss function
     state_dim : int
         number of elements in the environment states
-    state_ph : tf.placeholder
-        placeholder for the environment states
+    obs_ph : tf.placeholder
+        placeholder for the environment observations
     goal_ph : tf.placeholder
         placeholder from the goals that are provided from the layer that is one
         level above the current layer
@@ -107,22 +107,23 @@ class Critic:
             self.goal_dim = env.subgoal_dim
 
         self.loss_val = 0
-        self.state_dim = env.state_dim
-        self.state_ph = tf.placeholder(
-            tf.float32, shape=(None, env.state_dim), name='state_ph')
-        self.goal_ph = tf.placeholder(
-            tf.float32, shape=(None, self.goal_dim))
+        self.state_dim = env.observation_space.shape[0]
+        self.obs_ph = tf.placeholder(
+            tf.float32,
+            shape=(None, env.observation_space.shape[0]),
+            name='obs_ph')
+        self.goal_ph = tf.placeholder(tf.float32, shape=(None, self.goal_dim))
 
         # Dimensions of action placeholder will differ depending on layer level
         if layer_number == 0:
-            action_dim = env.action_dim
+            action_dim = env.action_space.shape[0]
         else:
             action_dim = env.subgoal_dim
 
         self.action_ph = tf.placeholder(
             tf.float32, shape=(None, action_dim), name='action_ph')
 
-        self.features_ph = tf.concat([self.state_ph, self.goal_ph,
+        self.features_ph = tf.concat([self.obs_ph, self.goal_ph,
                                       self.action_ph], axis=1)
 
         # Set parameters to give critic optimistic initialization near q_init
@@ -178,7 +179,7 @@ class Critic:
             the output Q-value
         """
         return self.sess.run(self.infer, feed_dict={
-            self.state_ph: state,
+            self.obs_ph: state,
             self.goal_ph: goal,
             self.action_ph: action
         })[0]
@@ -201,7 +202,7 @@ class Critic:
             the output Q-value
         """
         return self.sess.run(self.target, feed_dict={
-            self.state_ph: state,
+            self.obs_ph: state,
             self.goal_ph: goal,
             self.action_ph: action
         })[0]
@@ -240,7 +241,7 @@ class Critic:
         # Q network. Make sure you also make the updates specified in the
         # "learn" method in the "layer.py" file.
         wanted_qs = self.sess.run(self.infer, feed_dict={
-            self.state_ph: new_states,
+            self.obs_ph: new_states,
             self.goal_ph: goals,
             self.action_ph: new_actions
         })
@@ -249,7 +250,7 @@ class Critic:
         # Uncomment to use target networks
         wanted_qs = self.sess.run(self.target,
                 feed_dict={
-                    self.state_ph: new_states,
+                    self.obs_ph: new_states,
                     self.goal_ph: goals,
                     self.action_ph: new_actions
                 })
@@ -267,7 +268,7 @@ class Critic:
                 "Q-Value target not within proper bounds"
 
         self.loss_val, _ = self.sess.run([self.loss, self.train], feed_dict={
-            self.state_ph: old_states,
+            self.obs_ph: old_states,
             self.goal_ph: goals,
             self.action_ph: old_actions,
             self.wanted_qs: wanted_qs
@@ -291,7 +292,7 @@ class Critic:
             the gradient values for each trainable variable
         """
         grads = self.sess.run(self.gradient, feed_dict={
-            self.state_ph: state,
+            self.obs_ph: state,
             self.goal_ph: goal,
             self.action_ph: action
         })

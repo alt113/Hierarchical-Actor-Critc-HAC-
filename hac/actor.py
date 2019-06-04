@@ -12,9 +12,9 @@ class Actor:
     ----------
     sess : tf.Session
         the tensorflow session
-    action_space_bounds : TODO
+    action_space_bounds : array_like
         TODO
-    action_offset : TODO
+    action_offset : array_like
         TODO
     action_space_size : int
         dimension of the action space by the actor class. Set to the
@@ -31,8 +31,8 @@ class Actor:
         actor target update rate
     batch_size : int
         SGD batch size
-    state_ph : tf.placeholder
-        placeholder for the environment states
+    obs_ph : tf.placeholder
+        placeholder for the environment observations
     goal_ph : tf.placeholder
         placeholder from the goals that are provided from the layer that is one
         level above the current layer
@@ -101,29 +101,25 @@ class Actor:
 
         # Dimensions of action will depend on layer level
         if layer_number == 0:
-            self.action_space_size = env.action_dim
+            self.action_space_size = env.action_space.shape[0]
         else:
             self.action_space_size = env.subgoal_dim
 
         self.actor_name = 'actor_{}'.format(layer_number)
 
         # Dimensions of goal placeholder will differ depending on layer level
-        if layer_number == flags.layers - 1:
-            self.goal_dim = env.end_goal_dim
-        else:
-            self.goal_dim = env.subgoal_dim
-
-        self.state_dim = env.state_dim
+        self.goal_dim = env.end_goal_dim \
+            if layer_number == flags.layers - 1 \
+            else env.subgoal_dim
+        self.state_dim = env.observation_space.shape[0]
 
         self.learning_rate = learning_rate
-        # self.exploration_policies = exploration_policies
         self.tau = tau
         self.batch_size = batch_size
 
-        self.state_ph = tf.placeholder(
-            tf.float32, shape=(None, self.state_dim))
+        self.obs_ph = tf.placeholder(tf.float32, shape=(None, self.state_dim))
         self.goal_ph = tf.placeholder(tf.float32, shape=(None, self.goal_dim))
-        self.features_ph = tf.concat([self.state_ph, self.goal_ph], axis=1)
+        self.features_ph = tf.concat([self.obs_ph, self.goal_ph], axis=1)
 
         # Create actor network
         self.infer = self.create_nn(self.features_ph)
@@ -172,7 +168,7 @@ class Actor:
             the output action
         """
         return self.sess.run(self.infer, feed_dict={
-            self.state_ph: state,
+            self.obs_ph: state,
             self.goal_ph: goal
         })
 
@@ -192,7 +188,7 @@ class Actor:
             the output action
         """
         return self.sess.run(self.target, feed_dict={
-            self.state_ph: state,
+            self.obs_ph: state,
             self.goal_ph: goal
         })
 
@@ -215,7 +211,7 @@ class Actor:
         """
         weights, policy_grad, _ = self.sess.run(
             [self.weights, self.policy_gradient, self.train], feed_dict={
-                self.state_ph: state,
+                self.obs_ph: state,
                 self.goal_ph: goal,
                 self.action_derivs: action_derivs
             }

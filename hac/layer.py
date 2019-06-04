@@ -194,7 +194,7 @@ class Layer:
             environment
         """
         if self.layer_number == 0:
-            action = np.zeros(env.action_dim)
+            action = np.zeros(env.action_space.shape[0])
         else:
             action = np.zeros(env.subgoal_dim)
 
@@ -248,7 +248,6 @@ class Layer:
                     np.reshape(self.current_state,
                                (1, len(self.current_state))),
                     np.reshape(self.goal, (1, len(self.goal))))[0], env)
-
                 action_type = "Noisy Policy"
 
             # Otherwise, choose random action
@@ -581,7 +580,7 @@ class Layer:
 
             # If layer is bottom level, execute low-level action
             else:
-                next_state = env.execute_action(action)
+                next_state, _, _, _ = env.step(action)
 
                 # Increment steps taken
                 agent.steps_taken += 1

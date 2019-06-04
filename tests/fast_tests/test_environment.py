@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from hac.environment import Environment
+from hac.environment import Environment, Pendulum, UR5
 
 
 # class TestEnv(unittest.TestCase):
@@ -50,7 +50,7 @@ class TestUR5(unittest.TestCase):
             (initial_joint_pos, initial_joint_pos), 1)
         initial_joint_ranges[0] = np.array([-np.pi / 8, np.pi / 8])
 
-        self.env = Environment(
+        self.env = UR5(
             model_name="ur5.xml",
             goal_space_train=[(-np.pi, np.pi),
                               (-np.pi/4, 0),
@@ -84,8 +84,8 @@ class TestUR5(unittest.TestCase):
 
     def test_init(self):
         self.assertEqual(self.env.name, 'ur5.xml')
-        self.assertEqual(self.env.state_dim, 6)
-        self.assertEqual(self.env.action_dim, 3)
+        self.assertEqual(self.env.observation_space.shape[0], 6)
+        self.assertEqual(self.env.action_space.shape[0], 3)
         np.testing.assert_array_almost_equal(self.env.action_bounds,
                                              [3.15, 5.00, 3.15])
         np.testing.assert_array_almost_equal(self.env.action_offset,
@@ -158,7 +158,7 @@ class TestPendulum(unittest.TestCase):
             return np.array([bound_angle(sim.data.qpos[0]), 15 if state[2] > 15
                              else -15 if state[2] < -15 else state[2]])
 
-        self.env = Environment(
+        self.env = Pendulum(
             model_name="pendulum.xml",
             goal_space_train=[(np.deg2rad(-16), np.deg2rad(16)), (-0.6, 0.6)],
             goal_space_test=[(0, 0), (0, 0)],
@@ -179,8 +179,8 @@ class TestPendulum(unittest.TestCase):
 
     def test_init(self):
         self.assertEqual(self.env.name, 'pendulum.xml')
-        self.assertEqual(self.env.state_dim, 3)
-        self.assertEqual(self.env.action_dim, 1)
+        self.assertEqual(self.env.observation_space.shape[0], 3)
+        self.assertEqual(self.env.action_space.shape[0], 1)
         np.testing.assert_array_almost_equal(self.env.action_bounds, [2])
         np.testing.assert_array_almost_equal(self.env.action_offset, [0])
         self.assertEqual(self.env.end_goal_dim, 2)
