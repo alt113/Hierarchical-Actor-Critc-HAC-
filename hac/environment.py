@@ -1,20 +1,17 @@
 import numpy as np
+import gym
+from gym.spaces import Box
 from mujoco_py import load_model_from_path, MjSim, MjViewer
 
 
-class Environment:
+class Environment(gym.Env):
     """Base environment class.
 
     TODO
 
-    The environment class is adapted to support two environments:
-
-    * UR5: TODO
-    * Pendelum: TODO
-
     Attributes
     ----------
-    name : str
+    name : str TODO remove and just call the separate environments
         name of the environment; adopted from the name of the model
     model : TODO
         TODO
@@ -24,9 +21,9 @@ class Environment:
         low-level environment observation dimension
     action_dim : int
         low-level action dimension
-    action_bounds : TODO
-        TODO
-    action_offset : TODO
+    action_bounds : array_like
+        low-level action bounds
+    action_offset : array_like
         TODO
     end_goal_dim : int
         TODO
@@ -122,16 +119,36 @@ class Environment:
         self.model = load_model_from_path("./mujoco_files/" + model_name)
         self.sim = MjSim(self.model)
 
+        # TODO: abstract the observation and action spaces
         # Set dimensions and ranges of states, actions, and goals in order to
         # configure actor/critic networks
         if model_name == "pendulum.xml":
+            # TODO: fill in
+            self.observation_space = Box(
+                low=0, high=1,
+                shape=(2 * len(self.sim.data.qpos) + len(self.sim.data.qvel),)
+            )
+            # TODO: remove
             self.state_dim = \
                 2 * len(self.sim.data.qpos) + len(self.sim.data.qvel)
         else:
             # State will include (i) joint angles and (ii) joint velocities
+            # TODO: fill in
+            self.observation_space = Box(
+                low=0, high=1,
+                shape=(len(self.sim.data.qpos) + len(self.sim.data.qvel),)
+            )
+            # TODO: remove
             self.state_dim = len(self.sim.data.qpos) + len(self.sim.data.qvel)
+        # TODO: fill in
+        self.action_space = Box(
+            low=0, high=1,
+            shape=(len(self.sim.model.actuator_ctrlrange),)
+        )
+        # TODO: remove
         # low-level action dim
         self.action_dim = len(self.sim.model.actuator_ctrlrange)
+        # TODO: remove
         # low-level action bounds
         self.action_bounds = self.sim.model.actuator_ctrlrange[:, 1]
         # Assumes symmetric low-level action ranges
@@ -173,9 +190,11 @@ class Environment:
         self.visualize = show  # Visualization boolean
         if self.visualize:
             self.viewer = MjViewer(self.sim)
+        else:
+            self.viewer = None
         self.num_frames_skip = num_frames_skip
 
-    def get_state(self):
+    def get_state(self):  # TODO: abstract the method
         """Get state, which concatenates joint positions and velocities."""
         if self.name == "pendulum.xml":
             return np.concatenate(
@@ -185,7 +204,7 @@ class Environment:
         else:
             return np.concatenate((self.sim.data.qpos, self.sim.data.qvel))
 
-    def reset_sim(self):
+    def reset(self):
         """Reset simulation to state within initial state specified by user.
 
         Returns
@@ -208,10 +227,11 @@ class Environment:
         # Return state
         return self.get_state()
 
-    def execute_action(self, action):
-        """Execute low-level action.
+    def step(self, action):
+        """Advance the simulation by one step.
 
-        This is done for number of frames specified by num_frames_skip.
+        This method executes the low-level action. This is done for number of
+        frames specified by num_frames_skip.
 
         Parameters
         ----------
@@ -222,6 +242,12 @@ class Environment:
         -------
         array_like
             the next observation
+        float
+            reward
+        bool
+            done mask
+        dict
+            extra info (set to an empty dictionary by default)
         """
         self.sim.data.ctrl[:] = action
         for _ in range(self.num_frames_skip):
@@ -229,9 +255,9 @@ class Environment:
             if self.visualize:
                 self.viewer.render()
 
-        return self.get_state()
+        return self.get_state(), None, None, {}  # FIXME
 
-    def display_end_goal(self, end_goal):
+    def display_end_goal(self, end_goal):  # TODO: abstract the method
         """Visualize end goal.
 
         This function may need to be adjusted for new environments.
@@ -301,7 +327,7 @@ class Environment:
             assert False, \
                 "Provide display end goal function in environment.py file"
 
-    def get_next_goal(self, test):
+    def get_next_goal(self, test):  # TODO: abstract the method
         """Return an end goal.
 
         Parameters
@@ -339,32 +365,32 @@ class Environment:
                 wrist_1_pos_4 = np.array([0.39225, -0.1197, 0, 1])
 
                 # Transformation matrix from shoulder to base reference frame
-                T_1_0 = np.array([[1, 0, 0, 0], [0, 1, 0, 0],
+                t_1_0 = np.array([[1, 0, 0, 0], [0, 1, 0, 0],
                                   [0, 0, 1, 0.089159], [0, 0, 0, 1]])
 
                 # Transformation matrix from upper arm to shoulder reference
                 # frame
-                T_2_1 = np.array([[np.cos(theta_1), -np.sin(theta_1), 0, 0],
+                t_2_1 = np.array([[np.cos(theta_1), -np.sin(theta_1), 0, 0],
                                   [np.sin(theta_1), np.cos(theta_1), 0, 0],
                                   [0, 0, 1, 0],
                                   [0, 0, 0, 1]])
 
                 # Transformation matrix from forearm to upper arm reference
                 # frame
-                T_3_2 = np.array([[np.cos(theta_2), 0, np.sin(theta_2), 0],
+                t_3_2 = np.array([[np.cos(theta_2), 0, np.sin(theta_2), 0],
                                   [0, 1, 0, 0.13585],
                                   [-np.sin(theta_2), 0, np.cos(theta_2), 0],
                                   [0, 0, 0, 1]])
 
                 # Transformation matrix from wrist 1 to forearm reference frame
-                T_4_3 = np.array([[np.cos(theta_3), 0, np.sin(theta_3), 0.425],
+                t_4_3 = np.array([[np.cos(theta_3), 0, np.sin(theta_3), 0.425],
                                   [0, 1, 0, 0],
                                   [-np.sin(theta_3), 0, np.cos(theta_3), 0],
                                   [0, 0, 0, 1]])
 
-                forearm_pos = T_1_0.dot(T_2_1).dot(T_3_2).dot(
+                forearm_pos = t_1_0.dot(t_2_1).dot(t_3_2).dot(
                     forearm_pos_3)[:3]
-                wrist_1_pos = T_1_0.dot(T_2_1).dot(T_3_2).dot(T_4_3).dot(
+                wrist_1_pos = t_1_0.dot(t_2_1).dot(t_3_2).dot(t_4_3).dot(
                     wrist_1_pos_4)[:3]
 
                 # Make sure wrist 1 pos is above ground so can actually be
@@ -391,7 +417,7 @@ class Environment:
 
         return end_goal
 
-    def display_subgoals(self, subgoals):
+    def display_subgoals(self, subgoals):  # TODO: abstract the method
         """Visualize all subgoals.
 
         Parameters
@@ -425,37 +451,37 @@ class Environment:
                 wrist_1_pos_4 = np.array([0.39225, -0.1197, 0, 1])
 
                 # Transformation matrix from shoulder to base reference frame
-                T_1_0 = np.array([[1, 0, 0, 0],
+                t_1_0 = np.array([[1, 0, 0, 0],
                                   [0, 1, 0, 0],
                                   [0, 0, 1, 0.089159],
                                   [0, 0, 0, 1]])
 
                 # Transformation matrix from upper arm to shoulder reference
                 # frame
-                T_2_1 = np.array([[np.cos(theta_1), -np.sin(theta_1), 0, 0],
+                t_2_1 = np.array([[np.cos(theta_1), -np.sin(theta_1), 0, 0],
                                   [np.sin(theta_1), np.cos(theta_1), 0, 0],
                                   [0, 0, 1, 0],
                                   [0, 0, 0, 1]])
 
                 # Transformation matrix from forearm to upper arm reference
                 # frame
-                T_3_2 = np.array([[np.cos(theta_2), 0, np.sin(theta_2), 0],
+                t_3_2 = np.array([[np.cos(theta_2), 0, np.sin(theta_2), 0],
                                   [0, 1, 0, 0.13585],
                                   [-np.sin(theta_2), 0, np.cos(theta_2), 0],
                                   [0, 0, 0, 1]])
 
                 # Transformation matrix from wrist 1 to forearm reference frame
-                T_4_3 = np.array([[np.cos(theta_3), 0, np.sin(theta_3), 0.425],
+                t_4_3 = np.array([[np.cos(theta_3), 0, np.sin(theta_3), 0.425],
                                   [0, 1, 0, 0],
                                   [-np.sin(theta_3), 0, np.cos(theta_3), 0],
                                   [0, 0, 0, 1]])
 
                 # Determine joint position relative to original reference frame
                 # shoulder_pos = T_1_0.dot(shoulder_pos_1)
-                upper_arm_pos = T_1_0.dot(T_2_1).dot(upper_arm_pos_2)[:3]
-                forearm_pos = T_1_0.dot(T_2_1).dot(T_3_2).dot(
+                upper_arm_pos = t_1_0.dot(t_2_1).dot(upper_arm_pos_2)[:3]
+                forearm_pos = t_1_0.dot(t_2_1).dot(t_3_2).dot(
                     forearm_pos_3)[:3]
-                wrist_1_pos = T_1_0.dot(T_2_1).dot(T_3_2).dot(T_4_3).dot(
+                wrist_1_pos = t_1_0.dot(t_2_1).dot(t_3_2).dot(t_4_3).dot(
                     wrist_1_pos_4)[:3]
 
                 joint_pos = [upper_arm_pos, forearm_pos, wrist_1_pos]
