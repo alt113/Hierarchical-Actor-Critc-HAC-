@@ -6,7 +6,7 @@ properly.
 """
 
 import numpy as np
-from hac.environment import Environment
+from hac.environment import Pendulum
 from hac.utils import check_validity
 from hac.agent import Agent
 
@@ -104,8 +104,8 @@ def design_agent_and_env(flags):
 
     # In the inverted pendulum environment, the end goal will be the desired
     # joint angle and joint velocity for the pendulum.
-    goal_space_train = [[np.deg2rad(-16), np.deg2rad(16)], [-0.6, 0.6]]
-    goal_space_test = [[0, 0], [0, 0]]
+    goal_space_train = [(np.deg2rad(-16), np.deg2rad(16)), (-0.6, 0.6)]
+    goal_space_test = [(0, 0), (0, 0)]
 
     # Provide a function that maps from the state space to the end goal space.
     # This is used to determine whether the agent should be given the sparse
@@ -200,11 +200,11 @@ def design_agent_and_env(flags):
                    subgoal_thresholds, max_actions, timesteps_per_action)
 
     # Instantiate and return agent and environment
-    env = Environment(model_name, goal_space_train, goal_space_test,
-                      project_state_to_end_goal, end_goal_thresholds,
-                      initial_state_space, subgoal_bounds,
-                      project_state_to_subgoal, subgoal_thresholds,
-                      max_actions, timesteps_per_action, flags.show)
+    env = Pendulum(model_name, goal_space_train, goal_space_test,
+                   project_state_to_end_goal, end_goal_thresholds,
+                   initial_state_space, subgoal_bounds,
+                   project_state_to_subgoal, subgoal_thresholds,
+                   max_actions, timesteps_per_action, flags.show)
 
     agent = Agent(flags, env, agent_params)
 

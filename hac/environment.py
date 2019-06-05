@@ -11,7 +11,7 @@ class Environment(gym.Env):
 
     Attributes
     ----------
-    name : str TODO remove and just call the separate environments
+    name : str
         name of the environment; adopted from the name of the model
     model : TODO
         TODO
@@ -21,10 +21,6 @@ class Environment(gym.Env):
         TODO
     action_space : gym.spaces.*
         TODO
-    action_bounds : array_like
-        low-level action bounds
-    action_offset : array_like
-        TODO
     end_goal_dim : int
         TODO
     subgoal_dim : int
@@ -32,9 +28,9 @@ class Environment(gym.Env):
     subgoal_bounds : array_like
         range for each dimension of subgoal space
     project_state_to_end_goal : function
-        TODO
+        function that maps from the state space to the end goal space
     project_state_to_subgoal : function
-        TODO
+        state to subgoal projection function
     subgoal_bounds_symmetric : array_like
         TODO
     subgoal_bounds_offset : array_like
@@ -93,7 +89,7 @@ class Environment(gym.Env):
             upper and lower bounds of each element of the goal space during
             evaluation
         project_state_to_end_goal : function
-            TODO
+            function that maps from the state space to the end goal space
         end_goal_thresholds : array_like
             goal achievement thresholds. If the agent is within the threshold
             for each dimension, the end goal has been achieved and the reward
@@ -103,7 +99,7 @@ class Environment(gym.Env):
         subgoal_bounds : array_like
             range for each dimension of subgoal space
         project_state_to_subgoal : function
-            TODO
+            state to subgoal projection function
         subgoal_thresholds : array_like
             subgoal achievement thresholds
         max_actions : int, optional
@@ -121,11 +117,6 @@ class Environment(gym.Env):
 
         # Set dimensions and ranges of states, actions, and goals in order to
         # configure actor/critic networks
-        # TODO: remove
-        # low-level action bounds
-        self.action_bounds = self.sim.model.actuator_ctrlrange[:, 1]
-        # Assumes symmetric low-level action ranges
-        self.action_offset = np.zeros((len(self.action_bounds)))
         self.end_goal_dim = len(goal_space_test)
         self.subgoal_dim = len(subgoal_bounds)
         self.subgoal_bounds = subgoal_bounds
@@ -141,7 +132,7 @@ class Environment(gym.Env):
 
         for i in range(len(self.subgoal_bounds)):
             self.subgoal_bounds_symmetric[i] = \
-                (self.subgoal_bounds[i][1] - self.subgoal_bounds[i][0])/2
+                (self.subgoal_bounds[i][1] - self.subgoal_bounds[i][0]) / 2
             self.subgoal_bounds_offset[i] = \
                 self.subgoal_bounds[i][1] - self.subgoal_bounds_symmetric[i]
 
@@ -220,7 +211,7 @@ class Environment(gym.Env):
         for _ in range(self.num_frames_skip):
             self.sim.step()
             if self.visualize:
-                self.viewer.render()
+                self.render()
 
         return self.get_state(), None, None, {}  # FIXME
 
@@ -262,6 +253,9 @@ class Environment(gym.Env):
         """
         raise NotImplementedError
 
+    def render(self, mode='human'):  # TODO: make better
+        self.viewer.render()
+
 
 class UR5(Environment):
     """TODO
@@ -279,8 +273,8 @@ class UR5(Environment):
     @property
     def action_space(self):
         return Box(
-            low=-1, high=1,  # TODO: bounds?
-            shape=(len(self.sim.model.actuator_ctrlrange),)
+            low=-self.sim.model.actuator_ctrlrange[:, 1],
+            high=self.sim.model.actuator_ctrlrange[:, 1]
         )
 
     def get_state(self):
@@ -471,8 +465,8 @@ class Pendulum(Environment):
     @property
     def action_space(self):
         return Box(
-            low=-1, high=1,  # TODO: bounds?
-            shape=(len(self.sim.model.actuator_ctrlrange),)
+            low=-self.sim.model.actuator_ctrlrange[:, 1],
+            high=self.sim.model.actuator_ctrlrange[:, 1]
         )
 
     def get_state(self):

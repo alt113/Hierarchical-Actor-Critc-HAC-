@@ -158,8 +158,9 @@ class Layer:
         """
         # Noise added will be percentage of range
         if self.layer_number == 0:
-            action_bounds = env.action_bounds
-            action_offset = env.action_offset
+            ac_space = env.action_space
+            action_bounds = (ac_space.high - ac_space.low) / 2
+            action_offset = (ac_space.high + ac_space.low) / 2
         else:
             action_bounds = env.subgoal_bounds_symmetric
             action_offset = env.subgoal_bounds_offset
@@ -202,9 +203,13 @@ class Layer:
         # dimension's range
         for i in range(len(action)):
             if self.layer_number == 0:
+                ac_space = env.action_space
+                action_bounds = (ac_space.high - ac_space.low) / 2
+                action_offset = (ac_space.high + ac_space.low) / 2
+
                 action[i] = np.random.uniform(
-                    -env.action_bounds[i] + env.action_offset[i],
-                    +env.action_bounds[i] + env.action_offset[i])
+                    - action_bounds[i] + action_offset[i],
+                    + action_bounds[i] + action_offset[i])
             else:
                 action[i] = np.random.uniform(
                     env.subgoal_bounds[i][0], env.subgoal_bounds[i][1])
@@ -540,7 +545,8 @@ class Layer:
         subgoal_test : bool, optional
             TODO
         episode_num : int, optional
-            TODO
+            number of episodes since training has begun. Used for logging
+            purposes
 
         Returns
         -------

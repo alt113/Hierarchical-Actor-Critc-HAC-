@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from hac.environment import Environment, Pendulum, UR5
+from hac.environment import Pendulum, UR5
 
 
 # class TestEnv(unittest.TestCase):
@@ -86,10 +86,12 @@ class TestUR5(unittest.TestCase):
         self.assertEqual(self.env.name, 'ur5.xml')
         self.assertEqual(self.env.observation_space.shape[0], 6)
         self.assertEqual(self.env.action_space.shape[0], 3)
-        np.testing.assert_array_almost_equal(self.env.action_bounds,
-                                             [3.15, 5.00, 3.15])
-        np.testing.assert_array_almost_equal(self.env.action_offset,
-                                             [0.00, 0.00, 0.00])
+        np.testing.assert_array_almost_equal(
+            (self.env.action_space.high - self.env.action_space.low) / 2,
+            [3.15, 5.00, 3.15])
+        np.testing.assert_array_almost_equal(
+            (self.env.action_space.high + self.env.action_space.low) / 2,
+            [0.00, 0.00, 0.00])
         self.assertEqual(self.env.end_goal_dim, 3)
         self.assertEqual(self.env.subgoal_dim, 6)
         np.testing.assert_array_almost_equal(self.env.subgoal_bounds,
@@ -181,8 +183,10 @@ class TestPendulum(unittest.TestCase):
         self.assertEqual(self.env.name, 'pendulum.xml')
         self.assertEqual(self.env.observation_space.shape[0], 3)
         self.assertEqual(self.env.action_space.shape[0], 1)
-        np.testing.assert_array_almost_equal(self.env.action_bounds, [2])
-        np.testing.assert_array_almost_equal(self.env.action_offset, [0])
+        np.testing.assert_array_almost_equal(
+            (self.env.action_space.high - self.env.action_space.low) / 2, [2])
+        np.testing.assert_array_almost_equal(
+            (self.env.action_space.high + self.env.action_space.low) / 2, [0])
         self.assertEqual(self.env.end_goal_dim, 2)
         self.assertEqual(self.env.subgoal_dim, 2)
         np.testing.assert_array_almost_equal(

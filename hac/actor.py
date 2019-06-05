@@ -13,9 +13,9 @@ class Actor:
     sess : tf.Session
         the tensorflow session
     action_space_bounds : array_like
-        TODO
+        scaling term to the indivudal actions
     action_offset : array_like
-        TODO
+        offset term to the indivudal actions
     action_space_size : int
         dimension of the action space by the actor class. Set to the
         environment action dimension if at the lowest level of the hierarchy,
@@ -92,8 +92,9 @@ class Actor:
         # Determine range of actor network outputs.  This will be used to
         # configure outer layer of neural network
         if layer_number == 0:
-            self.action_space_bounds = env.action_bounds
-            self.action_offset = env.action_offset
+            ac_space = env.action_space
+            self.action_space_bounds = (ac_space.high - ac_space.low) / 2
+            self.action_offset = (ac_space.high + ac_space.low) / 2
         else:
             # Determine symmetric range of subgoal space and offset
             self.action_space_bounds = env.subgoal_bounds_symmetric
