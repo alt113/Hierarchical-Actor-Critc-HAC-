@@ -61,9 +61,10 @@ class TestUR5(unittest.TestCase):
             project_state_to_end_goal=project_state_to_end_goal,
             end_goal_thresholds=np.array(
                 [np.deg2rad(10) for _ in range(3)]),
-            initial_state_space=np.concatenate(
-                (initial_joint_ranges,
-                 np.zeros((len(initial_joint_ranges), 2))), 0),
+            initial_state_space=[(-0.39269908, 0.39269908),
+                                 (0.00322758, 0.00322758),
+                                 (-0.12794455, -0.12794455),
+                                 (0, 0), (0, 0), (0, 0)],
             subgoal_bounds=np.array([[-2 * np.pi, 2 * np.pi],
                                      [-2 * np.pi, 2 * np.pi],
                                      [-2 * np.pi, 2 * np.pi],
@@ -110,10 +111,10 @@ class TestUR5(unittest.TestCase):
         np.testing.assert_array_almost_equal(
             self.env.subgoal_thresholds,
             [0.17453293, 0.17453293, 0.17453293, 2, 2, 2])
-        np.testing.assert_array_almost_equal(
+        self.assertEqual(
             self.env.initial_state_space,
-            [[-0.39269908, 0.39269908], [0.00322758, 0.00322758],
-             [-0.12794455, -0.12794455], [0, 0], [0, 0], [0, 0]])
+            [(-0.39269908, 0.39269908), (0.00322758, 0.00322758),
+             (-0.12794455, -0.12794455), (0, 0), (0, 0), (0, 0)])
         self.assertEqual(self.env.goal_space_train,
                          [(-np.pi, np.pi), (-np.pi/4, 0), (-np.pi/4, np.pi/4)])
         self.assertEqual(self.env.goal_space_test,
@@ -209,7 +210,7 @@ class TestPendulum(unittest.TestCase):
         self.assertEqual(self.env.end_goal_dim, 2)
         self.assertEqual(self.env.subgoal_dim, 2)
         np.testing.assert_array_almost_equal(
-            self.env.subgoal_bounds, [[-3.14159265 , 3.14159265], [-15, 15.]])
+            self.env.subgoal_bounds, [[-3.14159265, 3.14159265], [-15, 15.]])
         np.testing.assert_array_almost_equal(
             self.env.subgoal_bounds_symmetric, [3.14159265, 15])
         np.testing.assert_array_almost_equal(
