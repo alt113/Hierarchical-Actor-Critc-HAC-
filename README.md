@@ -69,7 +69,7 @@ The test should return a message along the lines of:
 
 blank
 
-## FuN (FeUdal Networks for Hierarchical Reinforcement Learning)
+### FuN (FeUdal Networks for Hierarchical Reinforcement Learning)
 
 One of the early works on feudal variants of hierarchical reinforcement 
 learning since the surge of deep neural networks as a viable tool in machine

@@ -154,11 +154,8 @@ class Critic:
                 for i in range(len(self.target_weights))]
 
         self.wanted_qs = tf.placeholder(tf.float32, shape=(None, 1))
-
         self.loss = tf.reduce_mean(tf.square(self.wanted_qs - self.infer))
-
         self.train = tf.train.AdamOptimizer(learning_rate).minimize(self.loss)
-
         self.gradient = tf.gradients(self.infer, self.action_ph)
 
     def get_q_value(self, state, goal, action):

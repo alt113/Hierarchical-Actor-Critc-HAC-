@@ -201,8 +201,6 @@ class Environment(gym.Env):
                 self.initial_state_space[len(self.sim.data.qpos) + i][0],
                 self.initial_state_space[len(self.sim.data.qpos) + i][1])
 
-        # self.sim.step()  FIXME: not conducive to test
-
         # Return state
         return self.get_state()
 
