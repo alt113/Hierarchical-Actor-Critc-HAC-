@@ -95,7 +95,7 @@ def design_agent_and_env(flags):
     # the below initial joint position and joint velocity ranges.  These values
     # are then converted to the actual state space, which is
     # [cos(pendulum angle), sin(pendulum angle), pendulum velocity].
-    initial_state_space = np.array([[np.pi/4, 7*np.pi/4], [-0.05, 0.05]])
+    initial_state_space = [(np.pi/4, 7*np.pi/4), (-0.05, 0.05)]
 
     # Provide end goal space.  The code supports two types of end goal spaces
     # if user would like to train on a larger end goal space.  If user needs to

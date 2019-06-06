@@ -98,17 +98,11 @@ def design_agent_and_env(flags):
     # In the UR5 Reacher task, we use a random initial shoulder position and
     # use fixed values for the remainder.  Initial joint velocities are set to
     # 0.
-    initial_joint_pos = np.array(
-        [5.96625837e-03, 3.22757851e-03, -1.27944547e-01])
-    initial_joint_pos = np.reshape(
-        initial_joint_pos, (len(initial_joint_pos), 1))
-    initial_joint_ranges = np.concatenate(
-        (initial_joint_pos, initial_joint_pos), 1)
-    initial_joint_ranges[0] = np.array([-np.pi/8, np.pi/8])
-    # initial_joint_ranges[1] = np.array([-np.pi/4,0])
-
-    initial_state_space = np.concatenate(
-        (initial_joint_ranges, np.zeros((len(initial_joint_ranges), 2))), 0)
+    initial_joint_pos = [(-np.pi / 8, np.pi / 8),
+                         (3.22757851e-03, 3.22757851e-03),
+                         (-1.27944547e-01, -1.27944547e-01)]
+    initial_joint_speed = [(0, 0) for _ in range(len(initial_joint_pos))]
+    initial_state_space = initial_joint_pos + initial_joint_speed
 
     # Provide end goal space.  The code supports two types of end goal spaces
     # if user would like to train on a larger end goal space.  If user needs to
@@ -137,18 +131,17 @@ def design_agent_and_env(flags):
         return np.array([bound_angle(sim.data.qpos[i])
                          for i in range(len(sim.data.qpos))])
 
-    # Set end goal achievement thresholds.  If the agent is within the
-    # threshold for each dimension, the end goal has been achieved and the
-    # reward of 0 is granted.
+    # Set end goal achievement thresholds. If the agent is within the threshold
+    # for each dimension, the end goal has been achieved and the reward of 0 is
+    # granted.
     angle_threshold = np.deg2rad(10)
     end_goal_thresholds = np.array([angle_threshold for _ in range(3)])
 
     # Provide range for each dimension of subgoal space in order to configure
-    # subgoal actor networks.  Subgoal space can be the same as the state
-    # space or some other projection out of the state space. In our
-    # implementation of the UR5 reacher task, the subgoal space is the state
-    # space, which is the concatenation of all joint positions and joint
-    # velocities.
+    # subgoal actor networks. Subgoal space can be the same as the state space
+    # or some other projection out of the state space. In our implementation of
+    # the UR5 reacher task, the subgoal space is the state space, which is the
+    # concatenation of all joint positions and joint velocities.
     subgoal_bounds = np.array([
         [-2*np.pi, 2*np.pi], [-2*np.pi, 2*np.pi], [-2*np.pi, 2*np.pi],
         [-4, 4], [-4, 4], [-4, 4]])

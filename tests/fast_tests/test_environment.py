@@ -83,6 +83,7 @@ class TestUR5(unittest.TestCase):
         del self.env
 
     def test_init(self):
+        """Ensure that all variables are being initialized properly."""
         self.assertEqual(self.env.name, 'ur5.xml')
         self.assertEqual(self.env.observation_space.shape[0], 6)
         self.assertEqual(self.env.action_space.shape[0], 3)
@@ -123,10 +124,28 @@ class TestUR5(unittest.TestCase):
         self.assertEqual(self.env.num_frames_skip, 15)
 
     def test_step(self):
-        pass
+        """Ensure the step method is functioning properly.
+
+        This does the following tasks:
+        * checks that the simulation control is set to the action.
+        * Checks that a sufficient number of steps have passed.
+        """
+        action = [1, 2, 3]
+        steps_before = self.env.num_steps
+        self.env.step(action)
+        steps_after = self.env.num_steps
+
+        # check the number of steps that have passed
+        self.assertEqual(steps_after - steps_before, self.env.num_frames_skip)
+        # check the control method
+        np.testing.assert_array_almost_equal(action, self.env.sim.data.ctrl[:])
 
     def test_reset(self):
-        pass
+        """Ensure the state initialization is within the expected range."""
+        state = self.env.reset()
+        for i in range(len(state)):
+            self.assertTrue(state[i] >= self.env.initial_state_space[i][0])
+            self.assertTrue(state[i] <= self.env.initial_state_space[i][1])
 
     def test_display_end_goal(self):
         pass
@@ -166,8 +185,7 @@ class TestPendulum(unittest.TestCase):
             goal_space_test=[(0, 0), (0, 0)],
             project_state_to_end_goal=project_state_to_end_goal,
             end_goal_thresholds=np.array([np.deg2rad(9.5), 0.6]),
-            initial_state_space=np.array([[np.pi/4, 7*np.pi/4],
-                                          [-0.05, 0.05]]),
+            initial_state_space=[(np.pi/4, 7*np.pi/4), (-0.05, 0.05)],
             subgoal_bounds=np.array([[-np.pi, np.pi], [-15, 15]]),
             project_state_to_subgoal=project_state_to_subgoal,
             subgoal_thresholds=np.array([np.deg2rad(9.5), 0.6]),
@@ -180,6 +198,7 @@ class TestPendulum(unittest.TestCase):
         del self.env
 
     def test_init(self):
+        """Ensure that all variables are being initialized properly."""
         self.assertEqual(self.env.name, 'pendulum.xml')
         self.assertEqual(self.env.observation_space.shape[0], 3)
         self.assertEqual(self.env.action_space.shape[0], 1)
@@ -212,10 +231,39 @@ class TestPendulum(unittest.TestCase):
         self.assertEqual(self.env.num_frames_skip, 10)
 
     def test_step(self):
-        pass
+        """Ensure the step method is functioning properly.
+
+        This does the following tasks:
+        * checks that the simulation control is set to the action.
+        * Checks that a sufficient number of steps have passed.
+        """
+        action = [1]
+        steps_before = self.env.num_steps
+        self.env.step(action)
+        steps_after = self.env.num_steps
+
+        # check the number of steps that have passed
+        self.assertEqual(steps_after - steps_before, self.env.num_frames_skip)
+        # check the control method
+        np.testing.assert_array_almost_equal(action, self.env.sim.data.ctrl[:])
 
     def test_reset(self):
-        pass
+        """Ensure the state initialization is within the expected range."""
+        state = self.env.reset()
+        num_obj = int(len(state)/3)
+        for i in range(num_obj):
+            self.assertTrue(np.arccos(state[i])
+                            >= self.env.initial_state_space[i][0])
+            self.assertTrue(np.arccos(state[i])
+                            <= self.env.initial_state_space[i][1])
+            # self.assertTrue(np.arcsin(state[i + num_obj])
+            #                 >= self.env.initial_state_space[i][0])
+            # self.assertTrue(np.arcsin(state[i + num_obj])
+            #                 <= self.env.initial_state_space[i][1])
+            self.assertTrue(state[i + 2 * num_obj]
+                            >= self.env.initial_state_space[i + num_obj][0])
+            self.assertTrue(state[i + 2 * num_obj]
+                            <= self.env.initial_state_space[i + num_obj][1])
 
     def test_display_end_goal(self):
         pass

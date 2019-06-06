@@ -41,8 +41,9 @@ class Environment(gym.Env):
         granted.
     subgoal_thresholds : array_like
         subgoal achievement thresholds
-    initial_state_space : array_like
-        initial values for all elements in the state space
+    initial_state_space : list of (float, float)
+        bounds for the initial values for all elements in the state space.
+        This is achieved during the reset procedure.
     goal_space_train : list of (float, float)
         upper and lower bounds of each element of the goal space during
         training
@@ -60,6 +61,8 @@ class Environment(gym.Env):
         TODO
     num_frames_skip : int
         number of time steps per atomic action
+    num_steps : int
+        number of steps since the start of the current rollout
     """
 
     def __init__(self,
@@ -94,8 +97,9 @@ class Environment(gym.Env):
             goal achievement thresholds. If the agent is within the threshold
             for each dimension, the end goal has been achieved and the reward
             of 0 is granted.
-        initial_state_space : array_like
-            initial values for all elements in the state space
+        initial_state_space : list of (float, float)
+            bounds for the initial values for all elements in the state space.
+            This is achieved during the reset procedure.
         subgoal_bounds : array_like
             range for each dimension of subgoal space
         project_state_to_subgoal : function
@@ -158,6 +162,8 @@ class Environment(gym.Env):
             self.viewer = None
         self.num_frames_skip = num_frames_skip
 
+        self.num_steps = 0
+
     def get_state(self):
         """Get state, which concatenates joint positions and velocities."""
         raise NotImplementedError
@@ -170,6 +176,9 @@ class Environment(gym.Env):
         array_like
             the initial observation
         """
+        # Reset the time counter.
+        self.num_steps = 0
+
         # Reset joint positions and velocities
         for i in range(len(self.sim.data.qpos)):
             self.sim.data.qpos[i] = np.random.uniform(
@@ -180,7 +189,7 @@ class Environment(gym.Env):
                 self.initial_state_space[len(self.sim.data.qpos) + i][0],
                 self.initial_state_space[len(self.sim.data.qpos) + i][1])
 
-        self.sim.step()
+        # self.sim.step()  FIXME: not conducive to test
 
         # Return state
         return self.get_state()
@@ -210,6 +219,7 @@ class Environment(gym.Env):
         self.sim.data.ctrl[:] = action
         for _ in range(self.num_frames_skip):
             self.sim.step()
+            self.num_steps += 1
             if self.visualize:
                 self.render()
 

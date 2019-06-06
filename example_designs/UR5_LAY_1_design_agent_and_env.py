@@ -94,21 +94,13 @@ def design_agent_and_env(flags):
 
     # Provide initial state space consisting of the ranges for all joint angles
     # and velocities. In the UR5 Reacher task, we use a random initial shoulder
-    # position and use fixed values for the remainder.  Initial joint
-    # velocities are set to 0.
-
-    initial_joint_pos = np.array(
-        [5.96625837e-03, 3.22757851e-03, -1.27944547e-01])
-    initial_joint_pos = np.reshape(
-        initial_joint_pos, (len(initial_joint_pos), 1))
-
-    initial_joint_ranges = np.concatenate(
-        (initial_joint_pos, initial_joint_pos), 1)
-    initial_joint_ranges[0] = np.array([-np.pi/8, np.pi/8])
-    # initial_joint_ranges[1] = np.array([-np.pi/4,0])
-
-    initial_state_space = np.concatenate(
-        (initial_joint_ranges, np.zeros((len(initial_joint_ranges), 2))), 0)
+    # position and use fixed values for the remainder. Initial joint velocities
+    # are set to 0.
+    initial_joint_pos = [(-np.pi / 8, np.pi / 8),
+                         (3.22757851e-03, 3.22757851e-03),
+                         (-1.27944547e-01, -1.27944547e-01)]
+    initial_joint_speed = [(0, 0) for _ in range(len(initial_joint_pos))]
+    initial_state_space = initial_joint_pos + initial_joint_speed
 
     # Provide end goal space.  The code supports two types of end goal spaces
     # if user would like to train on a larger end goal space.  If user needs

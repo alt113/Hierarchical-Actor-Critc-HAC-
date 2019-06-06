@@ -73,8 +73,9 @@ def check_validity(model_name,
         goal achievement thresholds. If the agent is within the threshold for
         each dimension, the end goal has been achieved and the reward of 0 is
         granted.
-    initial_state_space : array_like
-        initial values for all elements in the state space
+    initial_state_space : list of (float, float)
+        bounds for the initial values for all elements in the state space.
+        This is achieved during the reset procedure.
     subgoal_bounds : array_like
         range for each dimension of subgoal space
     subgoal_thresholds : array_like
