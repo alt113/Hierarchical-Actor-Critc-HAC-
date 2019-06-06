@@ -15,7 +15,7 @@ before_install:
 
   # Create conda environment.
   - conda env create -f environment.yml
-  - source activate hac
+  - source activate h-baselines
 
   # Other packages to install
   - pip install flake8 .

@@ -1,4 +1,4 @@
-name: hac
+name: h-baselines
 
 dependencies:
   - python==3.6.7
