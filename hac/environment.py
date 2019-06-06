@@ -1,7 +1,11 @@
 import numpy as np
 import gym
-from gym.spaces import Box
-from mujoco_py import load_model_from_path, MjSim, MjViewer
+
+try:
+    import mujoco_py
+except ImportError:
+    # for testing purposes
+    import hac.utils.test_utils as mujoco_py
 
 
 class Environment(gym.Env):
@@ -116,8 +120,9 @@ class Environment(gym.Env):
         self.name = model_name
 
         # Create Mujoco Simulation
-        self.model = load_model_from_path("./mujoco_files/" + model_name)
-        self.sim = MjSim(self.model)
+        self.model = mujoco_py.load_model_from_path(
+            "./mujoco_files/" + model_name)
+        self.sim = mujoco_py.MjSim(self.model)
 
         # Set dimensions and ranges of states, actions, and goals in order to
         # configure actor/critic networks
@@ -157,7 +162,7 @@ class Environment(gym.Env):
         # Implement visualization if necessary
         self.visualize = show  # Visualization boolean
         if self.visualize:
-            self.viewer = MjViewer(self.sim)
+            self.viewer = mujoco_py.MjViewer(self.sim)
         else:
             self.viewer = None
         self.num_frames_skip = num_frames_skip
@@ -275,14 +280,14 @@ class UR5(Environment):
 
     @property
     def observation_space(self):
-        return Box(
+        return gym.spaces.Box(
             low=-1, high=1,  # TODO: bounds?
             shape=(len(self.sim.data.qpos) + len(self.sim.data.qvel),)
         )
 
     @property
     def action_space(self):
-        return Box(
+        return gym.spaces.Box(
             low=-self.sim.model.actuator_ctrlrange[:, 1],
             high=self.sim.model.actuator_ctrlrange[:, 1]
         )
@@ -467,14 +472,14 @@ class Pendulum(Environment):
     @property
     def observation_space(self):
         # State will include (i) joint angles and (ii) joint velocities
-        return Box(
+        return gym.spaces.Box(
             low=0, high=1,  # TODO: bounds?
             shape=(2 * len(self.sim.data.qpos) + len(self.sim.data.qvel),)
         )
 
     @property
     def action_space(self):
-        return Box(
+        return gym.spaces.Box(
             low=-self.sim.model.actuator_ctrlrange[:, 1],
             high=self.sim.model.actuator_ctrlrange[:, 1]
         )
