@@ -7,7 +7,6 @@ properly.
 
 import numpy as np
 from hac.environment import Environment
-from hac.utils import check_validity
 from hac.agent import Agent
 
 
@@ -208,11 +207,6 @@ def design_agent_and_env(flags):
         # episodes. To change number of testing episodes, go to "ran_HAC.py".
         "num_exploration_episodes": 50
     }
-
-    # Ensure environment customization have been properly entered
-    check_validity(model_name, goal_space_train, goal_space_test,
-                   end_goal_thresholds, initial_state_space, subgoal_bounds,
-                   subgoal_thresholds, max_actions, timesteps_per_action)
 
     # Instantiate and return agent and environment
     env = Environment(model_name, goal_space_train, goal_space_test,

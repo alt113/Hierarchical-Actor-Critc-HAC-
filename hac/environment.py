@@ -1,11 +1,12 @@
 import numpy as np
 import gym
+from hac.utils import check_validity
 
 try:
     import mujoco_py
 except ImportError:
     # for testing purposes
-    import hac.utils.test_utils as mujoco_py
+    import hac.utils.dummy_mujoco as mujoco_py
 
 
 class Environment(gym.Env):
@@ -18,7 +19,7 @@ class Environment(gym.Env):
     name : str
         name of the environment; adopted from the name of the model
     model : TODO
-        TODO
+        the imported MuJoCo model
     sim : mujoco_py.MjSim
         TODO
     observation_space : gym.spaces.*
@@ -62,7 +63,7 @@ class Environment(gym.Env):
     visualize : bool
         specifies whether to render the environment
     viewer : mujoco_py.MjViewer
-        TODO
+        a display GUI showing the scene of an MjSim object
     num_frames_skip : int
         number of time steps per atomic action
     num_steps : int
@@ -117,6 +118,12 @@ class Environment(gym.Env):
         show : bool, optional
             specifies whether to render the environment. Defaults to False.
         """
+        # Ensure environment customization have been properly entered.
+        check_validity(model_name, goal_space_train, goal_space_test,
+                       end_goal_thresholds, initial_state_space,
+                       subgoal_bounds, subgoal_thresholds, max_actions,
+                       num_frames_skip)
+
         self.name = model_name
 
         # Create Mujoco Simulation

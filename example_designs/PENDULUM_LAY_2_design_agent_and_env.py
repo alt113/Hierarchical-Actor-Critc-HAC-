@@ -7,7 +7,6 @@ properly.
 
 import numpy as np
 from hac.environment import Pendulum
-from hac.utils import check_validity
 from hac.agent import Agent
 
 
@@ -193,11 +192,6 @@ def design_agent_and_env(flags):
 
     # For other relavent agent hyperparameters, please refer to the "agent.py"
     # and "layer.py" files
-
-    # Ensure environment customization have been properly entered
-    check_validity(model_name, goal_space_train, goal_space_test,
-                   end_goal_thresholds, initial_state_space, subgoal_bounds,
-                   subgoal_thresholds, max_actions, timesteps_per_action)
 
     # Instantiate and return agent and environment
     env = Pendulum(model_name, goal_space_train, goal_space_test,
