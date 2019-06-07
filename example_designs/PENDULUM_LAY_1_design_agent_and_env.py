@@ -27,20 +27,19 @@ def design_agent_and_env(flags):
     hac.Environment
         the training environment
     """
-
-    """
-    1. DESIGN AGENT
-
-    The key hyperparameters for agent construction are
-
-        a. Number of levels in agent hierarchy
-        b. Max sequence length in which each policy will specialize
-        c. Max number of atomic actions allowed in an episode
-        d. Environment timesteps per atomic action
-
-    See Section 3 of this file for other agent hyperparameters that can be
-    configured.
-    """
+    # ======================================================================= #
+    # Step 1. Design agent                                                    #
+    #                                                                         #
+    # The key hyperparameters for agent construction are                      #
+    #                                                                         #
+    #  a. Number of levels in agent hierarchy                                 #
+    #  b. Max sequence length in which each policy will specialize            #
+    #  c. Max number of atomic actions allowed in an episode                  #
+    #  d. Environment timesteps per atomic action                             #
+    #                                                                         #
+    # See Section 3 of this file for other agent hyperparameters that can be  #
+    # configured.                                                             #
+    # ======================================================================= #
 
     # TODO: move to runner command
     # Enter number of levels in agent hierarchy
@@ -57,33 +56,33 @@ def design_agent_and_env(flags):
     # Provide the number of time steps per atomic action.
     timesteps_per_action = 10
 
-    """
-    2. DESIGN ENVIRONMENT
-
-        a. Designer must provide the original UMDP (S,A,T,G,R).
-            - The S,A,T components can be fulfilled by providing the Mujoco
-              model.
-            - The user must separately specifiy the initial state space.
-            - G can be provided by specifying the end goal space.
-            - R, which by default uses a shortest path {-1,0} reward function,
-              can be implemented by specifying two components: (i) a function
-              that maps the state space to the end goal space and (ii) the end
-              goal achievement thresholds for each dimensions of the end goal.
-
-        b. In order to convert the original UMDP into a hierarchy of k UMDPs,
-           the designer must also provide
-            - The subgoal action space, A_i, for all higher-level UMDPs i > 0
-            - R_i for levels 0 <= i < k-1 (i.e., all levels that try to achieve
-              goals in the subgoal space).  As in the original UMDP, R_i can be
-              implemented by providing two components:(i) a function that maps
-              the state space to the subgoal space and (ii) the subgoal
-              achievement thresholds.
-
-        c. Designer should also provide subgoal and end goal visualization
-           functions in order to show video of training. These can be updated
-           in "display_subgoal" and "display_end_goal" methods in the
-           "environment.py" file.
-    """
+    # ======================================================================= #
+    # Step 2. Design environment                                              #
+    #                                                                         #
+    #  a. Designer must provide the original UMDP (S,A,T,G,R).                #
+    #     - The S,A,T components can be fulfilled by providing the Mujoco     #
+    #       model.                                                            #
+    #     - The user must separately specifiy the initial state space.        #
+    #     - G can be provided by specifying the end goal space.               #
+    #     - R, which by default uses a shortest path {-1,0} reward function,  #
+    #       can be implemented by specifying two components: (i) a function   #
+    #       that maps the state space to the end goal space and (ii) the end  #
+    #       goal achievement thresholds for each dimensions of the end goal.  #
+    #                                                                         #
+    #  b. In order to convert the original UMDP into a hierarchy of k UMDPs,  #
+    #     the designer must also provide                                      #
+    #     - The subgoal action space, A_i, for all higher-level UMDPs i > 0   #
+    #     - R_i for levels 0 <= i < k-1 (i.e., all levels that try to achieve #
+    #       goals in the subgoal space).  As in the original UMDP, R_i can be #
+    #       implemented by providing two components:(i) a function that maps  #
+    #       the state space to the subgoal space and (ii) the subgoal         #
+    #       achievement thresholds.                                           #
+    #                                                                         #
+    #  c. Designer should also provide subgoal and end goal visualization     #
+    #     functions in order to show video of training. These can be updated  #
+    #     in "display_subgoal" and "display_end_goal" methods in the          #
+    #     "environment.py" file.                                              #
+    # ======================================================================= #
 
     # Provide file name of Mujoco model(i.e., "pendulum.xml").  Make sure file
     # is stored in "mujoco_files" folder
@@ -147,16 +146,17 @@ def design_agent_and_env(flags):
     # To properly visualize goals, update "display_end_goal" and
     # "display_subgoals" methods in "environment.py"
 
-    """
-    3. SET MISCELLANEOUS HYPERPARAMETERS
-
-    Below are some other agent hyperparameters that can affect results,
-    including
-        a. Subgoal testing percentage
-        b. Subgoal penalty
-        c. Exploration noise
-        d. Replay buffer size
-    """
+    # ======================================================================= #
+    # Step 3. Set miscellaneous hyperparameters                               #
+    #                                                                         #
+    # Below are some other agent hyperparameters that can affect results,     #
+    # including                                                               #
+    #                                                                         #
+    #  a. Subgoal testing percentage                                          #
+    #  b. Subgoal penalty                                                     #
+    #  c. Exploration noise                                                   #
+    #  d. Replay buffer size                                                  #
+    # ======================================================================= #
 
     agent_params = {
         # Define percentage of actions that a subgoal level (i.e. level i > 0)
@@ -191,7 +191,7 @@ def design_agent_and_env(flags):
         "num_exploration_episodes": 50
     }
 
-    # For other relavent agent hyperparameters, please refer to the "agent.py"
+    # For other relevant agent hyperparameters, please refer to the "agent.py"
     # and "layer.py" files
 
     # Instantiate and return agent and environment

@@ -19,13 +19,13 @@ def _read_requirements_file():
 
 
 setup(
-    name='hac',
+    name='h-baselines',
     version=__version__,
     packages=find_packages(),
     description="A repository of high-performing hierarchical reinforcement "
                 "learning models and algorithms.",
     long_description=open("README.md").read(),
-    url="https://github.com/AboudyKreidieh/hac",
+    url="https://github.com/AboudyKreidieh/h-baselines",
     keywords="hierarchical-reinforcement-learning deep-learning python",
     install_requires=_read_requirements_file(),
     extras_require=extras,

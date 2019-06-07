@@ -6,7 +6,7 @@ from hac.critic import Critic
 
 
 class Layer:
-    """TODO
+    """Base layer object for multi-layer hierarchical policies.
 
     TODO
 
@@ -18,8 +18,8 @@ class Layer:
         the parsed arguments from the command line (see options.py)
     sess : tf.Session
         the tensorflow session
-    time_limit : TODO
-        TODO
+    time_limit : int
+        maximum number of actions that can be performed by a given layer
     current_state : array_like
         the most recent observation
     goal : array_like
@@ -39,14 +39,15 @@ class Layer:
         SGD batch size
     replay_buffer : hac.ExperienceBuffer
         the replay buffer object
-    temp_goal_replay_storage : list of TODO
+    temp_goal_replay_storage : list
         buffer to store not yet finalized goal replay transitions
     actor : hac.Actor
         the actor class
     critic : hac.Critic
         the critic class
-    noise_perc : TODO
-        TODO
+    noise_perc : array_like
+        percentage of range for each action that will be used to define the
+        standard deviation of the noise injected to an action
     maxed_out : bool
         flag to indicate when layer has ran out of attempts to achieve goal.
         This will be important for subgoal testing.
@@ -296,7 +297,6 @@ class Layer:
         # next_state, goal, terminate boolean, None]
         transition = [self.current_state, hindsight_action, reward, next_state,
                       self.goal, finished, None]
-        # print("AR Trans: ", transition)
 
         # Add action replay transition to layer's replay buffer
         self.replay_buffer.add(deepcopy(transition))
@@ -354,8 +354,10 @@ class Layer:
             TODO
         hindsight_goal : array_like
             TODO
-        goal_thresholds : TODO
-            TODO
+        goal_thresholds : array_like
+            goal achievement thresholds. If the agent is within the threshold
+            for each dimension, the end goal has been achieved and the reward
+            of 0 is granted.
 
         Returns
         -------
@@ -389,8 +391,10 @@ class Layer:
 
         Parameters
         ----------
-        goal_thresholds : TODO
-            TODO
+        goal_thresholds : array_like
+            goal achievement thresholds. If the agent is within the threshold
+            for each dimension, the end goal has been achieved and the reward
+            of 0 is granted.
         """
         # Choose transitions to serve as goals during goal replay.  The last
         # transition will always be used
@@ -454,7 +458,7 @@ class Layer:
         subgoal : array_like
             TODO
         next_state : array_like
-            TODO
+            next step observation
         high_level_goal_achieved : bool
             specifies whether the goal assigned by the layer one level above
             was achieved
@@ -487,14 +491,14 @@ class Layer:
 
         Parameters
         ----------
-        max_lay_achieved : TODO
-            TODO
+        max_lay_achieved : int
+            highest layer that achieved its goal
         agent : hac.Agent
             the agent class
         env : hac.Environment
             the training environment
-        attempts_made : TODO
-            TODO
+        attempts_made : int
+            number of actions the layer performed in the current rollout
 
         Returns
         -------
@@ -522,7 +526,7 @@ class Layer:
         # NOTE: During testing, agent will have env.max_action attempts to
         # achieve goal
         elif agent.flags.test \
-                and self.layer_number < agent.flags.layers-1 \
+                and self.layer_number < agent.flags.layers - 1 \
                 and attempts_made >= self.time_limit:
             return True
 
@@ -550,8 +554,10 @@ class Layer:
 
         Returns
         -------
-        TODO
-            TODO
+        list of bool
+            specifies whether the goal was achieved by each layer
+        int
+            highest layer that achieved its goal
         """
         # Set layer's current state and new goal state
         self.goal = agent.goal_array[self.layer_number]
@@ -730,14 +736,16 @@ class Layer:
                     self.actor.get_action(old_states, goals))
                 self.actor.update(old_states, goals, action_derivs)
 
-        # To use target networks comment for loop above and uncomment for loop
-        # below
+        # =================================================================== #
+        # To use target networks comment for loop above and uncomment for     #
+        # loop below.                                                         #
+        # =================================================================== #
+
         # for _ in range(num_updates):
         #     # Update weights of non-target networks
         #     if self.replay_buffer.size >= self.batch_size:
         #         old_states, actions, rewards, new_states, goals, \
         #             is_terminals = self.replay_buffer.get_batch()
-        #
         #
         #         self.critic.update(
         #             old_states, actions, rewards, new_states, goals,

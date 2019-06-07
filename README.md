@@ -16,10 +16,10 @@ blank
 * [Environments](#environments)
   * [UR5](#ur5)
   * [Pendulum](#pendulum)
-  * Ant Push
-  * Ant Fall
-  * Figure Eight v2
-  * Merge v2
+  * [Ant Push](#ant-push)
+  * [Ant Fall](#ant-fall)
+  * [Figure Eight v2](#figure-eight-v2)
+  * [Merge v2](#merge-v2)
 * [Citing](#citing)
 * [Bibliography](#bibliography)
 * [Useful Links](#useful-links)
@@ -96,9 +96,36 @@ blank
 
 blank
 
+### Ant Push
+
+blank
+
+### Ant Fall
+
+blank
+
+### Figure Eight v2
+
+blank
+
+### Merge v2
+
+blank
+
 ## Citing
 
-TODO
+To cite this repository in publications, use the following:
+
+```
+@misc{h-baselines,
+    author = {Kreidieh, Abdul Rahman},
+    title = {Hierarchical Baselines},
+    year = {2019},
+    publisher = {GitHub},
+    journal = {GitHub repository},
+    howpublished = {\url{https://github.com/AboudyKreidieh/h-baselines}},
+}
+```
 
 ## Bibliography
 
