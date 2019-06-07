@@ -49,10 +49,9 @@ def design_agent_and_env(flags):
     # Enter max sequence length in which each policy will specialize
     flags.time_scale = 600
 
-    # Enter max number of atomic actions.
-    #
-    # This will typically be flags.time_scale**(flags.layers). However, in the
-    # UR5 Reacher task, we use a shorter episode length.
+    # Enter max number of atomic actions. This will typically be
+    # flags.time_scale**(flags.layers). However, in the UR5 Reacher task, we
+    # use a shorter episode length.
     max_actions = 600
 
     # Provide the number of time steps per atomic action.
@@ -86,7 +85,7 @@ def design_agent_and_env(flags):
     #     "environment.py" file.                                              #
     # ======================================================================= #
 
-    # Provide file name of Mujoco model(i.e., "pendulum.xml").  Make sure file
+    # Provide file name of Mujoco model(i.e., "pendulum.xml"). Make sure file
     # is stored in "mujoco_files" folder
     model_name = "ur5.xml"
 
@@ -100,9 +99,9 @@ def design_agent_and_env(flags):
     initial_joint_speed = [(0, 0) for _ in range(len(initial_joint_pos))]
     initial_state_space = initial_joint_pos + initial_joint_speed
 
-    # Provide end goal space.  The code supports two types of end goal spaces
-    # if user would like to train on a larger end goal space.  If user needs
-    # to make additional customizations to the end goals, the "get_next_goal"
+    # Provide end goal space. The code supports two types of end goal spaces if
+    # user would like to train on a larger end goal space. If user needs to
+    # make additional customizations to the end goals, the "get_next_goal"
     # method in "environment.py" can be updated.
 
     # In the UR5 reacher environment, the end goal will be the desired joint
@@ -112,11 +111,12 @@ def design_agent_and_env(flags):
 
     # Provide a function that maps from the state space to the end goal space.
     # This is used to determine whether the agent should be given the sparse
-    # reward.  It is also used for Hindsight Experience Replay to determine
+    # reward. It is also used for Hindsight Experience Replay to determine
     # which end goal was achieved after a sequence of actions.
 
     # Supplementary function that will ensure all angles are between
     # [-2*np.pi,2*np.pi]
+
     def bound_angle(angle):
         bounded_angle = np.absolute(angle) % (2*np.pi)
         if angle < 0:
@@ -127,17 +127,17 @@ def design_agent_and_env(flags):
         return np.array([bound_angle(sim.data.qpos[i])
                          for i in range(len(sim.data.qpos))])
 
-    # Set end goal achievement thresholds.  If the agent is within the
-    # threshold for each dimension, the end goal has been achieved and the
-    # reward of 0 is granted.
+    # Set end goal achievement thresholds. If the agent is within the threshold
+    # for each dimension, the end goal has been achieved and the reward of 0 is
+    # granted.
     angle_threshold = np.deg2rad(10)
     end_goal_thresholds = np.array([angle_threshold for _ in range(3)])
 
     # Provide range for each dimension of subgoal space in order to configure
-    # subgoal actor networks.  Subgoal space can be the same as the state space
-    # or some other projection out of the state space.  In our implementation
-    # of the UR5 reacher task, the subgoal space is the state space, which is
-    # the concatenation of all joint positions and joint velocities.
+    # subgoal actor networks. Subgoal space can be the same as the state space
+    # or some other projection out of the state space. In our implementation of
+    # the UR5 reacher task, the subgoal space is the state space, which is the
+    # concatenation of all joint positions and joint velocities.
     subgoal_bounds = np.array([[-2 * np.pi, 2 * np.pi],
                                [-2 * np.pi, 2 * np.pi],
                                [-2 * np.pi, 2 * np.pi],

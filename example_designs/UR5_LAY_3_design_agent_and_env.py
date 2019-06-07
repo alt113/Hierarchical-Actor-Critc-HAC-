@@ -52,7 +52,7 @@ def design_agent_and_env(flags):
     # Enter max number of atomic actions. This will typically be
     # flags.time_scale**(flags.layers). However, in the UR5 Reacher task, we
     # use a shorter episode length.
-    max_actions = flags.time_scale**(flags.layers-1)*6
+    max_actions = 600
 
     # Provide the number of time steps per atomic action.
     timesteps_per_action = 15
@@ -116,6 +116,7 @@ def design_agent_and_env(flags):
 
     # Supplementary function that will ensure all angles are between
     # [-2*np.pi,2*np.pi]
+
     def bound_angle(angle):
         bounded_angle = np.absolute(angle) % (2*np.pi)
         if angle < 0:
