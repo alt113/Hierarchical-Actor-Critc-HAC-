@@ -49,9 +49,9 @@ def design_agent_and_env(flags):
     # Enter max sequence length in which each policy will specialize
     flags.time_scale = 10
 
-    # Enter max number of atomic actions.
-    # This will typically be flags.time_scale**(flags.layers).
-    max_actions = flags.time_scale ** flags.layers
+    # Enter max number of atomic actions. This will typically be
+    # flags.time_scale**(flags.layers).
+    max_actions = 1000
 
     # Provide the number of time steps per atomic action.
     timesteps_per_action = 10
@@ -88,15 +88,15 @@ def design_agent_and_env(flags):
     # is stored in "mujoco_files" folder
     model_name = "pendulum.xml"
 
-    # Provide initial state space consisting of the ranges for all joint
-    # angles and velocities. In the inverted pendulum task, we randomly sample
-    # from the below initial joint position and joint velocity ranges. These
-    # values are then converted to the actual state space, which is
+    # Provide initial state space consisting of the ranges for all joint angles
+    # and velocities. In the inverted pendulum task, we randomly sample from
+    # the below initial joint position and joint velocity ranges. These values
+    # are then converted to the actual state space, which is
     # [cos(pendulum angle), sin(pendulum angle), pendulum velocity].
-    initial_state_space = [(np.pi / 4, 7 * np.pi / 4), (-0.05, 0.05)]
+    initial_state_space = [(np.pi/4, 7*np.pi/4), (-0.05, 0.05)]
 
-    # Provide end goal space. The code supports two types of end goal spaces
-    # if user would like to train on a larger end goal space. If user needs to
+    # Provide end goal space. The code supports two types of end goal spaces if
+    # user would like to train on a larger end goal space. If user needs to
     # make additional customizations to the end goals, the "get_next_goal"
     # method in "environment.py" can be updated.
 
@@ -113,15 +113,13 @@ def design_agent_and_env(flags):
     # Supplemental function that converts angle to between [-pi,pi]
     def bound_angle(angle):
         bounded_angle = angle % (2 * np.pi)
-
         if np.absolute(bounded_angle) > np.pi:
             bounded_angle = -(np.pi - bounded_angle % np.pi)
-
         return bounded_angle
 
     def project_state_to_end_goal(sim, state):
         return np.array([bound_angle(sim.data.qpos[0]), 15 if state[2] > 15
-                        else -15 if state[2] < -15 else state[2]])
+                         else -15 if state[2] < -15 else state[2]])
 
     # Set end goal achievement thresholds. If the agent is within the threshold
     # for each dimension, the end goal has been achieved and the reward of 0 is
@@ -139,8 +137,7 @@ def design_agent_and_env(flags):
 
     # Provide state to subgoal projection function.
     def project_state_to_subgoal(sim, state):
-        return np.array([bound_angle(sim.data.qpos[0]),
-                         15 if state[2] > 15
+        return np.array([bound_angle(sim.data.qpos[0]), 15 if state[2] > 15
                          else -15 if state[2] < -15 else state[2]])
 
     # Set subgoal achievement thresholds
@@ -159,6 +156,9 @@ def design_agent_and_env(flags):
     #  b. Subgoal penalty                                                     #
     #  c. Exploration noise                                                   #
     #  d. Replay buffer size                                                  #
+    #                                                                         #
+    # For other relevant agent hyperparameters, refer to the "agent.py" and   #
+    # "layer.py" files.                                                       #
     # ======================================================================= #
 
     agent_params = {
@@ -169,10 +169,10 @@ def design_agent_and_env(flags):
         # Define subgoal penalty for missing subgoal. Please note that by
         # default the Q value target for missed subgoals does not include
         # Q-value of next state (i.e, discount rate = 0). As a result, the
-        # Q-value target for missed subgoal just equals penalty.  For instance
+        # Q-value target for missed subgoal just equals penalty. For instance
         # in this 3-level pendulum implementation, if a level proposes a
         # subgoal and misses it, the Q target value for this action would be
-        # -10.  To incorporate the next state in the penalty, go to the
+        # -10. To incorporate the next state in the penalty, go to the
         # "penalize_subgoal" method in the "layer.py" file.
         "subgoal_penalty": -flags.time_scale,
 
@@ -193,10 +193,10 @@ def design_agent_and_env(flags):
         "num_exploration_episodes": 50
     }
 
-    # For other relavent agent hyperparameters, please refer to the "agent.py"
-    # and "layer.py" files
+    # ======================================================================= #
+    # Step 4: Instantiate and return agent and environment.                   #
+    # ======================================================================= #
 
-    # Instantiate and return agent and environment
     env = Pendulum(model_name, goal_space_train, goal_space_test,
                    project_state_to_end_goal, end_goal_thresholds,
                    initial_state_space, subgoal_bounds,

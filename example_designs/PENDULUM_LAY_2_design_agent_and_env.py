@@ -156,6 +156,9 @@ def design_agent_and_env(flags):
     #  b. Subgoal penalty                                                     #
     #  c. Exploration noise                                                   #
     #  d. Replay buffer size                                                  #
+    #                                                                         #
+    # For other relevant agent hyperparameters, refer to the "agent.py" and   #
+    # "layer.py" files.                                                       #
     # ======================================================================= #
 
     agent_params = {
@@ -190,10 +193,10 @@ def design_agent_and_env(flags):
         "num_exploration_episodes": 50
     }
 
-    # For other relavent agent hyperparameters, please refer to the "agent.py"
-    # and "layer.py" files
+    # ======================================================================= #
+    # Step 4: Instantiate and return agent and environment.                   #
+    # ======================================================================= #
 
-    # Instantiate and return agent and environment
     env = Pendulum(model_name, goal_space_train, goal_space_test,
                    project_state_to_end_goal, end_goal_thresholds,
                    initial_state_space, subgoal_bounds,

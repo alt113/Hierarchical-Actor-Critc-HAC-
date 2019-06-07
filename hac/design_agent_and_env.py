@@ -32,10 +32,10 @@ def design_agent_and_env(flags):
     #                                                                         #
     # The key hyperparameters for agent construction are                      #
     #                                                                         #
-    # a. Number of levels in agent hierarchy                                  #
-    # b. Max sequence length in which each policy will specialize             #
-    # c. Max number of atomic actions allowed in an episode                   #
-    # d. Environment timesteps per atomic action                              #
+    #  a. Number of levels in agent hierarchy                                 #
+    #  b. Max sequence length in which each policy will specialize            #
+    #  c. Max number of atomic actions allowed in an episode                  #
+    #  d. Environment timesteps per atomic action                             #
     #                                                                         #
     # See Section 3 of this file for other agent hyperparameters that can be  #
     # configured.                                                             #
@@ -49,7 +49,7 @@ def design_agent_and_env(flags):
     # Enter max sequence length in which each policy will specialize
     flags.time_scale = 10
 
-    # Enter max number of atomic actions.  This will typically be
+    # Enter max number of atomic actions. This will typically be
     # flags.time_scale**(flags.layers). However, in the UR5 Reacher task, we
     # use a shorter episode length.
     max_actions = flags.time_scale**(flags.layers-1)*6
@@ -62,29 +62,29 @@ def design_agent_and_env(flags):
     #                                                                         #
     # This step performs the following tasks:                                 #
     #                                                                         #
-    # a. Designer must provide the original UMDP (S,A,T,G,R).                 #
-    #    - The S,A,T components can be fulfilled by providing the Mujoco      #
-    #      model.                                                             #
-    #    - The user must separately specifiy the initial state space.         #
-    #    - G can be provided by specifying the end goal space.                #
-    #    - R, which by default uses a shortest path {-1,0} reward function,   #
-    #      can be implemented by specifying two components: (i) a function    #
-    #      that maps the state space to the end goal space and (ii) the end   #
-    #      goal achievement thresholds for each dimensions of the end goal.   #
+    #  a. Designer must provide the original UMDP (S,A,T,G,R).                #
+    #     - The S,A,T components can be fulfilled by providing the Mujoco     #
+    #       model.                                                            #
+    #     - The user must separately specifiy the initial state space.        #
+    #     - G can be provided by specifying the end goal space.               #
+    #     - R, which by default uses a shortest path {-1,0} reward function,  #
+    #       can be implemented by specifying two components: (i) a function   #
+    #       that maps the state space to the end goal space and (ii) the end  #
+    #       goal achievement thresholds for each dimensions of the end goal.  #
     #                                                                         #
-    # b. In order to convert the original UMDP into a hierarchy of k UMDPs,   #
-    #    the designer must also provide                                       #
-    #    - The subgoal action space, A_i, for all higher-level UMDPs i > 0    #
-    #    - R_i for levels 0 <= i < k-1 (i.e., all levels that try to achieve  #
-    #      goals in the subgoal space).  As in the original UMDP, R_i can be  #
-    #      implemented by providing two components:(i) a function that maps   #
-    #      the state space to the subgoal space and (ii) the subgoal          #
-    #      achievement thresholds.                                            #
+    #  b. In order to convert the original UMDP into a hierarchy of k UMDPs,  #
+    #     the designer must also provide                                      #
+    #     - The subgoal action space, A_i, for all higher-level UMDPs i > 0   #
+    #     - R_i for levels 0 <= i < k-1 (i.e., all levels that try to achieve #
+    #       goals in the subgoal space).  As in the original UMDP, R_i can be #
+    #       implemented by providing two components:(i) a function that maps  #
+    #       the state space to the subgoal space and (ii) the subgoal         #
+    #       achievement thresholds.                                           #
     #                                                                         #
-    #  c. Designer should also provide subgoal and end goal visualization     #
-    #     functions in order to show video of training. These can be updated  #
-    #     in "display_subgoal" and "display_end_goal" methods in the          #
-    #     "environment.py" file.                                              #
+    #   c. Designer should also provide subgoal and end goal visualization    #
+    #      functions in order to show video of training. These can be updated #
+    #      in "display_subgoal" and "display_end_goal" methods in the         #
+    #      "environment.py" file.                                             #
     # ======================================================================= #
 
     # Provide file name of Mujoco model(i.e., "pendulum.xml").  Make sure file
@@ -167,13 +167,13 @@ def design_agent_and_env(flags):
     # Below are some other agent hyperparameters that can affect results,     #
     # including:                                                              #
     #                                                                         #
-    # a. Subgoal testing percentage                                           #
-    # b. Subgoal penalty                                                      #
-    # c. Exploration noise                                                    #
-    # d. Replay buffer size                                                   #
+    #  a. Subgoal testing percentage                                          #
+    #  b. Subgoal penalty                                                     #
+    #  c. Exploration noise                                                   #
+    #  d. Replay buffer size                                                  #
     #                                                                         #
-    # For other relevant agent hyperparameters, please refer to the           #
-    # "agent.py" and "layer.py" files.                                        #
+    # For other relevant agent hyperparameters, refer to the "agent.py" and   #
+    # "layer.py" files.                                                       #
     # ======================================================================= #
 
     agent_params = {
@@ -208,7 +208,10 @@ def design_agent_and_env(flags):
         "num_exploration_episodes": 50
     }
 
-    # Instantiate and return agent and environment
+    # ======================================================================= #
+    # Step 4: Instantiate and return agent and environment.                   #
+    # ======================================================================= #
+
     env = Environment(model_name, goal_space_train, goal_space_test,
                       project_state_to_end_goal, end_goal_thresholds,
                       initial_state_space, subgoal_bounds,
