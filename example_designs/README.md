@@ -2,16 +2,18 @@
 
 This folder contains a sequence of runner scripts that allow you to initialize
 a training procedure for each of the supported environments mentioned in the
-[README]() within the repository's main directory.
+[README](https://github.com/AboudyKreidieh/Hierarchical-Actor-Critc-HAC-#environments)
+within the repository's main directory.
 
 TODO: describing the benchmarking and sample commands sections for each
 environment.
 
 Before continuing to the examples, we recommend **installing h-baselines** by 
-executing the following [installation instructions](). Moreover, if you have
-decided to create a conda environment, be sure to activate the environment
-before running any of the examples. You can do so by running the following
-command in terminal:
+executing the following 
+[installation instructions](https://github.com/AboudyKreidieh/Hierarchical-Actor-Critc-HAC-#installation). 
+Moreover, if you have decided to create a conda environment, be sure to 
+activate the environment before running any of the examples. You can do so by 
+running the following command in terminal:
 
 ```bash
 source activate h-baselines
