@@ -73,8 +73,8 @@ def design_agent_and_env(flags):
     #     the designer must also provide                                      #
     #     - The subgoal action space, A_i, for all higher-level UMDPs i > 0   #
     #     - R_i for levels 0 <= i < k-1 (i.e., all levels that try to achieve #
-    #       goals in the subgoal space).  As in the original UMDP, R_i can be #
-    #       implemented by providing two components:(i) a function that maps  #
+    #       goals in the subgoal space). As in the original UMDP, R_i can be  #
+    #       implemented by providing two components: (i) a function that maps #
     #       the state space to the subgoal space and (ii) the subgoal         #
     #       achievement thresholds.                                           #
     #                                                                         #

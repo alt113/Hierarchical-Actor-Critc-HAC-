@@ -43,11 +43,11 @@ def design_agent_and_env(flags):
 
     # TODO: move to runner command
     # Enter number of levels in agent hierarchy
-    flags.layers = 2
+    flags.layers = 1
 
     # TODO: move to runner command
     # Enter max sequence length in which each policy will specialize
-    flags.time_scale = 25
+    flags.time_scale = 600
 
     # Enter max number of atomic actions. This will typically be
     # flags.time_scale**(flags.layers). However, in the UR5 Reacher task, we
@@ -74,8 +74,8 @@ def design_agent_and_env(flags):
     #     the designer must also provide                                      #
     #     - The subgoal action space, A_i, for all higher-level UMDPs i > 0   #
     #     - R_i for levels 0 <= i < k-1 (i.e., all levels that try to achieve #
-    #       goals in the subgoal space).  As in the original UMDP, R_i can be #
-    #       implemented by providing two components:(i) a function that maps  #
+    #       goals in the subgoal space). As in the original UMDP, R_i can be  #
+    #       implemented by providing two components: (i) a function that maps #
     #       the state space to the subgoal space and (ii) the subgoal         #
     #       achievement thresholds.                                           #
     #                                                                         #
@@ -118,7 +118,7 @@ def design_agent_and_env(flags):
     # [-2*np.pi,2*np.pi]
 
     def bound_angle(angle):
-        bounded_angle = np.absolute(angle) % (2*np.pi)
+        bounded_angle = np.absolute(angle) % (2 * np.pi)
         if angle < 0:
             bounded_angle = -bounded_angle
         return bounded_angle
