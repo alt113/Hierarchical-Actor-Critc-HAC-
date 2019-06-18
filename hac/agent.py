@@ -1,4 +1,5 @@
 import numpy as np
+from hac.utils import ensure_dir
 from hac.layer import Layer
 import tensorflow as tf
 import os
@@ -56,6 +57,10 @@ class Agent:
         self.flags = flags
         self.sess = tf.Session()
 
+        # create the writer object for logging to tensorboard
+        ensure_dir(flags.logdir)
+        self.writer = tf.summary.FileWriter(flags.logdir)
+
         # Set subgoal testing ratio each layer will use
         self.subgoal_test_perc = agent_params["subgoal_test_perc"]
 
@@ -71,6 +76,9 @@ class Agent:
         # Initialize actor/critic networks.  Load saved parameters if not
         # retraining
         self.initialize_networks()
+
+        # Add the graph to tensorboard.
+        self.writer.add_graph(self.sess.graph)
 
         # goal_array will store goal for each layer of agent.
         self.goal_array = [None for _ in range(flags.layers)]

@@ -9,7 +9,7 @@ blank
 ## Contents
 
 * [Installation](#installation)
-* [Supported Algorithms](#supported-algorithms)
+* [Supported Models/Algorithms](#supported-modelsalgorithms)
   * [FuN (FeUdal Networks for Hierarchical Reinforcement Learning)](#fun-feudal-networks-for-hierarchical-reinforcement-learning)
   * [HIRO (Data Efficient Hierarchical Reinforcement Learning)](#hiro-data-efficient-hierarchical-reinforcement-learning)
   * [HAC (Learning Multi-Level Hierarchies with Hindsight)](#hac-learning-multi-level-hierarchies-with-hindsight)
@@ -65,7 +65,7 @@ The test should return a message along the lines of:
 
     OK
 
-## Supported Algorithms
+## Supported Models/Algorithms
 
 blank
 
@@ -118,12 +118,12 @@ To cite this repository in publications, use the following:
 
 ```
 @misc{h-baselines,
-    author = {Kreidieh, Abdul Rahman},
-    title = {Hierarchical Baselines},
-    year = {2019},
-    publisher = {GitHub},
-    journal = {GitHub repository},
-    howpublished = {\url{https://github.com/AboudyKreidieh/h-baselines}},
+  author = {Kreidieh, Abdul Rahman},
+  title = {Hierarchical Baselines},
+  year = {2019},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/AboudyKreidieh/h-baselines}},
 }
 ```
 

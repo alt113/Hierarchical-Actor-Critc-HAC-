@@ -33,6 +33,12 @@ def parse_options(args):
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
+        'env',
+        type=str,
+        help='The environment to be implemented.'
+    )
+
+    parser.add_argument(
         '--retrain',
         action='store_true',
         help='Include to reset policy'
@@ -74,6 +80,13 @@ def parse_options(args):
         type=int,
         default=10,
         help='max sequence length in which each policy will specialize'
+    )
+
+    parser.add_argument(
+        '--logdir',
+        type=str,
+        default='./data/',
+        help='path to tensorboard log directory'
     )
 
     flags, _ = parser.parse_known_args(args)
