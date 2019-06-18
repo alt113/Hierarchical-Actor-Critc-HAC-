@@ -1,5 +1,6 @@
 import numpy as np
 import gym
+import os
 from hac.utils import check_validity
 
 try:
@@ -127,8 +128,10 @@ class Environment(gym.Env):
         self.name = model_name
 
         # Create Mujoco Simulation
+        mujoco_file_path = os.path.abspath(os.path.join(
+            os.path.dirname(__file__), '../example_designs/mujoco_files/'))
         self.model = mujoco_py.load_model_from_path(
-            "./mujoco_files/" + model_name)
+            os.path.join(mujoco_file_path, model_name))
         self.sim = mujoco_py.MjSim(self.model)
 
         # Set dimensions and ranges of states, actions, and goals in order to
