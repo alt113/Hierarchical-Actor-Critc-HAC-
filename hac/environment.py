@@ -30,7 +30,7 @@ class Environment(gym.Env):
     end_goal_dim : int
         TODO
     subgoal_dim : int
-        TODO
+        number of subgoal actions
     subgoal_bounds : array_like
         range for each dimension of subgoal space
     project_state_to_end_goal : function
@@ -38,9 +38,9 @@ class Environment(gym.Env):
     project_state_to_subgoal : function
         state to subgoal projection function
     subgoal_bounds_symmetric : array_like
-        TODO
+        scaling factor for the subgoal actions
     subgoal_bounds_offset : array_like
-        TODO
+        offset variable for the subgoal actions
     end_goal_thresholds : array_like
         goal achievement thresholds. If the agent is within the threshold for
         each dimension, the end goal has been achieved and the reward of 0 is

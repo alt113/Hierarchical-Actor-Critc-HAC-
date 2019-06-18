@@ -14,12 +14,8 @@ blank
   * [HIRO (Data Efficient Hierarchical Reinforcement Learning)](#hiro-data-efficient-hierarchical-reinforcement-learning)
   * [HAC (Learning Multi-Level Hierarchies with Hindsight)](#hac-learning-multi-level-hierarchies-with-hindsight)
 * [Environments](#environments)
-  * [UR5](#ur5)
-  * [Pendulum](#pendulum)
-  * [Ant Push](#ant-push)
-  * [Ant Fall](#ant-fall)
-  * [Figure Eight v2](#figure-eight-v2)
-  * [Merge v2](#merge-v2)
+  * [MuJoCo Environments](#mujoco-environments)
+  * [Mixed Autonomy Traffic](#mixed-autonomy-traffic)
 * [Citing](#citing)
 * [Bibliography](#bibliography)
 * [Useful Links](#useful-links)
@@ -88,29 +84,21 @@ blank
 
 This repository contains multiple 
 
-### UR5
+### MuJoCo Environments
 
 blank
 
-### Pendulum
+**Pendulum** blank
 
-blank
+**Ant Push** blank
 
-### Ant Push
+**Ant Fall** blank
 
-blank
+### Mixed Autonomy Traffic
 
-### Ant Fall
+**Figure Eight v2** blank
 
-blank
-
-### Figure Eight v2
-
-blank
-
-### Merge v2
-
-blank
+**Merge v2** blank
 
 ## Citing
 

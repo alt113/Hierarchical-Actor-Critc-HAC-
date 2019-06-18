@@ -3,7 +3,6 @@ from hac.utils import ensure_dir
 from hac.layer import Layer
 import tensorflow as tf
 import os
-import pickle as cpickle
 
 
 class Agent:
@@ -36,8 +35,6 @@ class Agent:
         number of low-level actions executed
     num_updates : int
         number of Q-value updates made after each episode
-    performance_log : list of float
-        used to store performance results
     other_params : dict
         additional agent parameters
     """
@@ -91,9 +88,6 @@ class Agent:
         # Below hyperparameter specifies number of Q-value updates made after
         # each episode
         self.num_updates = 40
-
-        # Below parameters will be used to store performance results
-        self.performance_log = []
 
         self.other_params = agent_params
 
@@ -250,19 +244,18 @@ class Agent:
         # Return whether end goal was achieved
         return goal_status[self.flags.layers-1]
 
-    def log_performance(self, success_rate):
+    def log_performance(self, success_rate, global_step):
         """Save performance evaluations.
-
-        TODO: describe how this is done and how it's helpful.
 
         Parameters
         ----------
         success_rate : float
             the percentage of the episodes that were successful during the
             evaluation procedure
+        global_step : int
+            number of training steps performed in the environment
         """
-        # Add latest success_rate to list
-        self.performance_log.append(success_rate)
-
-        # Save log
-        cpickle.dump(self.performance_log, open("performance_log.p", "wb"))
+        summary = tf.Summary()
+        summary.value.add(tag='Success Rate', simple_value=success_rate)
+        self.writer.add_summary(summary, global_step)
+        self.writer.flush()

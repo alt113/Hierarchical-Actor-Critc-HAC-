@@ -63,22 +63,18 @@ def run_HAC(flags, env, agent):
             # Train for an episode
             success = agent.train(env, episode)
 
-            if success:
-                print("Batch %d, Episode %d End Goal Achieved\n"
-                      % (batch, episode))
-
-                # Increment successful episode counter if applicable
-                if mix_train_test and batch % TEST_FREQ == 0:
-                    successful_episodes += 1
+            # Increment successful episode counter if applicable
+            if success and mix_train_test and batch % TEST_FREQ == 0:
+                successful_episodes += 1
 
         # Save agent
-        agent.save_model(episode)
+        agent.save_model(batch)
 
         # Finish evaluating policy if tested prior batch
         if mix_train_test and batch % TEST_FREQ == 0:
             # Log performance
             success_rate = successful_episodes / NUM_TEST_EPISODES * 100
             print("\nTesting Success Rate %.2f%%" % success_rate)
-            agent.log_performance(success_rate)
+            agent.log_performance(success_rate, batch)  # FIXME: batch
             agent.flags.test = False
             print("\n--- END TESTING ---\n")

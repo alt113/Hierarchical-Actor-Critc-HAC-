@@ -51,8 +51,8 @@ class Layer:
     maxed_out : bool
         flag to indicate when layer has ran out of attempts to achieve goal.
         This will be important for subgoal testing.
-    subgoal_penalty : TODO
-        TODO
+    subgoal_penalty : float
+        penalty associated with missing a subgoal
     """
 
     def __init__(self, layer_number, flags, env, sess, agent_params):
@@ -660,7 +660,7 @@ class Layer:
                         action, agent.current_state,
                         goal_status[self.layer_number])
 
-            # Print summary of transition TODO: tensorboard
+            # Print summary of transition
             if self.flags.verbose:
                 print("\nEpisode %d, Training Layer %d, Attempt %d" % (
                     episode_num, self.layer_number, attempts_made))
