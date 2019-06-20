@@ -41,14 +41,6 @@ def design_agent_and_env(flags):
     # configured.                                                             #
     # ======================================================================= #
 
-    # TODO: move to runner command
-    # Enter number of levels in agent hierarchy
-    flags.layers = 1
-
-    # TODO: move to runner command
-    # Enter max sequence length in which each policy will specialize
-    flags.time_scale = 600
-
     # Enter max number of atomic actions. This will typically be
     # flags.time_scale**(flags.layers). However, in the UR5 Reacher task, we
     # use a shorter episode length.
