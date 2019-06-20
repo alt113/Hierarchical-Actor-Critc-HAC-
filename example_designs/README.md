@@ -40,19 +40,19 @@ TODO: add plots of benchmarking results
 * To run the HAC algorithm with one layer, type:
   
   ```bash
-  python pendulum.py --layers=1 --time_scale=1000
+  python train.py "pendulum" --layers=1 --time_scale=1000
   ```
 
 * To run the HAC algorithm with two layers, type:
 
   ```bash
-  python pendulum.py --layers=2 --time_scale=32
+  python train.py "pendulum" --layers=2 --time_scale=32
   ```
 
 * To run the HAC algorithm with three layers, type:
 
   ```bash
-  python pendulum.py --layers=3 --time_scale=10
+  python train.py "pendulum" --layers=3 --time_scale=10
   ```
 
 ## UR5
@@ -66,19 +66,19 @@ TODO: add plots of benchmarking results
 * To run the HAC algorithm with one layer, type:
 
   ```bash
-  python ur5.py --layers=1 --time_scale=600
+  python train.py "ur5" --layers=1 --time_scale=600
   ```
 
 * To run the HAC algorithm with two layers, type:
 
   ```bash
-  python ur5.py --layers=2 --time_scale=25
+  python train.py "ur5" --layers=2 --time_scale=25
   ```
 
 * To run the HAC algorithm with three layers, type:
 
   ```bash
-  python ur5.py --layers=3 --time_scale=10
+  python train.py "ur5" --layers=3 --time_scale=10
   ```
 
 ## Creating a Custom Example

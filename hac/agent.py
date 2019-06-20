@@ -220,8 +220,7 @@ class Agent:
         bool
             whether the end goal was achieved
         """
-        # Select final goal from final goal space, defined in
-        # "design_agent_and_env.py"
+        # Select final goal from final goal space.
         self.goal_array[self.flags.layers - 1] = env.get_next_goal(
             self.flags.test)
         print("Next End Goal: ", self.goal_array[self.flags.layers - 1])
