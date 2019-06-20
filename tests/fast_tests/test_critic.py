@@ -1,8 +1,9 @@
 import unittest
 import tensorflow as tf
-from setup_scripts import setup_ur5
+# from setup_scripts import setup_ur5
 from hac.critic import Critic
 from hac.options import parse_options
+from tests.fast_tests.setup_scripts import setup_ur5
 
 
 class TestCritic(unittest.TestCase):
