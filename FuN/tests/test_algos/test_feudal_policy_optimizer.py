@@ -1,14 +1,15 @@
 """
-    ######################################################################################################
-    #                       Class of scripts to testing Feudal Network policy optimizer                  #
-    ######################################################################################################
+#############################################################
+#Class of scripts to testing Feudal Network policy optimizer#
+#############################################################
 """
 
 
 import gym
 import unittest
 import tensorflow as tf
-from FuN.scripts.training.feudal_networks.algos.feudal_policy_optimizer import FeudalPolicyOptimizer
+from FuN.scripts.training.feudal_networks.algos.feudal_policy_optimizer \
+    import FeudalPolicyOptimizer
 
 
 class TestFeudalPolicyOptimizer(unittest.TestCase):

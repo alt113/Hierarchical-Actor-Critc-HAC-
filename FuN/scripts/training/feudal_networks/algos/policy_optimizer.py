@@ -1,8 +1,8 @@
 """
-    ######################################################################################################
-    #               Much of the code in this file was originally developed as part of the                #
-    #                universe starter agent: https://github.com/openai/universe-starter-agent            #
-    ######################################################################################################
+############################################################################
+# Much of the code in this file was originally developed as part of the    #
+# universe starter agent: https://github.com/openai/universe-starter-agent #
+############################################################################
 
     This class serves as the basis for the LSTM Network policy optimizer.
     -----------------------------------------------------------------------
@@ -14,13 +14,16 @@ import tensorflow as tf
 import threading
 import six.moves.queue as queue
 
-from FuN.scripts.training.feudal_networks.policies.lstm_policy import LSTMPolicy
-from FuN.scripts.training.feudal_networks.policies.feudal_policy import FeudalPolicy
+from FuN.scripts.training.feudal_networks.policies.lstm_policy \
+    import LSTMPolicy
+from FuN.scripts.training.feudal_networks.policies.feudal_policy \
+    import FeudalPolicy
 
 
 def discount(x, gamma):
     """
-    The goal of the agent is to maximize the discounted return defined by this function.
+    The goal of the agent is to maximize
+    the discounted return defined by this function.
 
     Parameters
     ----------
@@ -59,16 +62,29 @@ def process_rollout(rollout, gamma, lambda_=1.0):
 
     features = rollout.features[0]
     # print features
-    return Batch(batch_si, batch_a, batch_adv, batch_r, rollout.terminal, features)
+    return Batch(batch_si,
+                 batch_a,
+                 batch_adv,
+                 batch_r,
+                 rollout.terminal,
+                 features)
 
 
-Batch = namedtuple("Batch", ["obs", "a", "returns", "terminal", "s", "g", "features"])
+Batch = namedtuple("Batch",
+                   ["obs",
+                    "a",
+                    "returns",
+                    "terminal",
+                    "s",
+                    "g",
+                    "features"])
 # Batch = namedtuple("Batch", ["si", "a", "adv", "r", "terminal", "features"])
 
 
 class PartialRollout(object):
     """
-    A piece of a complete rollout.  We run our agent, and process its experience
+    A piece of a complete rollout.
+    We run our agent, and process its experience
     once it has processed enough steps.
     """
     def __init__(self):
@@ -138,9 +154,12 @@ class RunnerThread(threading.Thread):
     Thread runner class used to optimize Tensorflow training of Feudal Network.
 
 
-    One of the key distinctions between a normal environment and a universe environment
-    is that a universe environment is _real time_.  This means that there should be a thread
-    that would constantly interact with the environment and tell it what to do.  This thread is here.
+    One of the key distinctions between a normal environment
+    and a universe environment
+    is that a universe environment is _real time_.  This means
+    that there should be a thread
+    that would constantly interact with the environment and tell it
+    what to do.  This thread is here.
     """
     def __init__(self, env, policy, num_local_steps, visualise):
         """
@@ -185,7 +204,8 @@ class RunnerThread(threading.Thread):
 
     def run(self):
         """
-        Overridden thread run function that will be called by start() is triggered.
+        Overridden thread run function that will
+        be called by start() is triggered.
 
         """
         with self.sess.as_default():
@@ -196,16 +216,23 @@ class RunnerThread(threading.Thread):
         Private helper run function to handle the queue data efficiently.
 
         """
-        rollout_provider = env_runner(self.env, self.policy, self.num_local_steps, self.summary_writer, self.visualise)
+        rollout_provider = env_runner(self.env,
+                                      self.policy,
+                                      self.num_local_steps,
+                                      self.summary_writer,
+                                      self.visualise)
         while True:
-            # the timeout variable exists because apparently, if one worker dies, the other workers
-            # won't die with it, unless the timeout is set to some large number.  This is an empirical
+            # the timeout variable exists
+            # because apparently, if one worker dies,
+            # the other workers
+            # won't die with it, unless the timeout
+            # is set to some large number.  This is an empirical
             # observation.
 
             self.queue.put(next(rollout_provider), timeout=600.0)
 
 
-def env_runner(env, policy, num_local_steps, summary_writer): #,visualise):
+def env_runner(env, policy, num_local_steps, summary_writer, visualise):
     """
     Function to begin running the training environment.
 
@@ -224,6 +251,8 @@ def env_runner(env, policy, num_local_steps, summary_writer): #,visualise):
         number of local steps to run
     summary_writer : object
         summary writer for logging purposes
+    visualise : object
+        BLANK
     """
     last_state = env.reset()
     last_features = policy.get_initial_features()
@@ -241,7 +270,12 @@ def env_runner(env, policy, num_local_steps, summary_writer): #,visualise):
             state, reward, terminal, info = env.step(action_to_take)
 
             # collect the experience
-            rollout.add(last_state, action, reward, value_, terminal, last_features)
+            rollout.add(last_state,
+                        action,
+                        reward,
+                        value_,
+                        terminal,
+                        last_features)
             length += 1
             rewards += reward
 
@@ -255,13 +289,16 @@ def env_runner(env, policy, num_local_steps, summary_writer): #,visualise):
                 summary_writer.add_summary(summary, policy.global_step.eval())
                 summary_writer.flush()
 
-            timestep_limit = env.spec.tags.get('wrapper_config.TimeLimit.max_episode_steps')
+            timestep_limit = env.spec.tags.get(
+                'wrapper_config.TimeLimit.max_episode_steps')
             if terminal or length >= timestep_limit:
                 terminal_end = True
-                if length >= timestep_limit or not env.metadata.get('semantics.autoreset'):
+                if length >= timestep_limit \
+                        or not env.metadata.get('semantics.autoreset'):
                     last_state = env.reset()
                 last_features = policy.get_initial_features()
-                print("Episode finished. Sum of rewards: %f. Length: %d" % (rewards, length))
+                print("Episode finished. Sum of rewards: %f. Length: %d"
+                      % (rewards, length))
                 length = 0
                 rewards = 0
                 break
@@ -269,7 +306,8 @@ def env_runner(env, policy, num_local_steps, summary_writer): #,visualise):
         if not terminal_end:
             rollout.r = policy.value(last_state, *last_features)
 
-        # once we have enough experience, yield it, and have the ThreadRunner place it on a queue
+        # once we have enough experience, yield it, and have
+        # the ThreadRunner place it on a queue
         yield rollout
 
 
@@ -279,7 +317,7 @@ class PolicyOptimizer(object):
 
     """
 
-    def __init__(self, env, task, policy,visualise):
+    def __init__(self, env, task, policy, visualise):
         """
         Instantiate the feudal policy optimizer.
 
@@ -298,14 +336,28 @@ class PolicyOptimizer(object):
         self.task = task
 
         worker_device = "/job:worker/task:{}/cpu:0".format(task)
-        with tf.device(tf.train.replica_device_setter(1, worker_device=worker_device)):
+        with tf.device(
+                tf.train.replica_device_setter(1,
+                                               worker_device=worker_device)):
             with tf.variable_scope("global"):
-                self.global_step = tf.get_variable("global_step", [], tf.int32, initializer=tf.constant_initializer(0, dtype=tf.int32),
-                                                   trainable=False)
+                self.global_step = tf.get_variable(
+                    "global_step",
+                    [],
+                    tf.int32,
+                    initializer=tf.constant_initializer(
+                        0,
+                        dtype=tf.int32),
+                    trainable=False)
                 if policy == 'lstm':
-                    self.network = LSTMPolicy(env.observation_space.shape, env.action_space.n,self.global_step)
+                    self.network = LSTMPolicy(
+                        env.observation_space.shape,
+                        env.action_space.n,
+                        self.global_step)
                 elif policy == 'feudal':
-                    self.network = FeudalPolicy(env.observation_space.shape, env.action_space.n,self.global_step)
+                    self.network = FeudalPolicy(
+                        env.observation_space.shape,
+                        env.action_space.n,
+                        self.global_step)
                 else:
                     print("Policy type unknown")
                     exit(0)
@@ -313,16 +365,22 @@ class PolicyOptimizer(object):
         with tf.device(worker_device):
             with tf.variable_scope("local"):
                 if policy == 'lstm':
-                    self.local_network = pi = LSTMPolicy(env.observation_space.shape, env.action_space.n,self.global_step)
+                    self.local_network = pi = LSTMPolicy(
+                        env.observation_space.shape,
+                        env.action_space.n,
+                        self.global_step)
                 elif policy == 'feudal':
-                    self.local_network = pi = FeudalPolicy(env.observation_space.shape, env.action_space.n,self.global_step)
+                    self.local_network = pi = FeudalPolicy(
+                        env.observation_space.shape,
+                        env.action_space.n,
+                        self.global_step)
                 else:
                     print("Policy type unknown")
                     exit(0)
                 pi.global_step = self.global_step
             self.policy = pi
             # build runner thread for collecting rollouts
-            self.runner = RunnerThread(env, self.policy, 20,visualise)
+            self.runner = RunnerThread(env, self.policy, 20, visualise)
 
             # formulate gradients
             grads = tf.gradients(pi.loss, pi.var_list)
@@ -331,7 +389,9 @@ class PolicyOptimizer(object):
             # build sync
             # copy weights from the parameter server to the local model
             self.sync = tf.group(*[v1.assign(v2)
-                for v1, v2 in zip(pi.var_list, self.network.var_list)])
+                                   for v1, v2 in zip(
+                    pi.var_list,
+                    self.network.var_list)])
             grads_and_vars = list(zip(grads, self.network.var_list))
             # for g,v in grads_and_vars:
             #     print g.name,v.name
@@ -339,7 +399,10 @@ class PolicyOptimizer(object):
 
             # build train op
             opt = tf.train.AdamOptimizer(1e-4)
-            self.train_op = tf.group(opt.apply_gradients(grads_and_vars), inc_step)
+            self.train_op = tf.group(
+                opt.apply_gradients(
+                    grads_and_vars),
+                inc_step)
             self.summary_writer = None
             self.local_steps = 0
 
@@ -372,12 +435,16 @@ class PolicyOptimizer(object):
 
     def train(self, sess):
         """
-        Function to start training Feudal Network to enhance policy at current session.
+        Function to start training Feudal Network
+        to enhance policy at current session.
 
 
-        This first runs the sync op so that the gradients are computed wrt the
-        current global weights. It then takes a rollout from the runner's queue,
-        converts it to a batch, and passes that batch and the train op to the
+        This first runs the sync op so that the gradients
+        are computed wrt the
+        current global weights. It then takes a rollout
+        from the runner's queue,
+        converts it to a batch, and passes that batch
+        and the train op to the
         policy to perform an update.
 
         Parameters
@@ -421,6 +488,8 @@ class PolicyOptimizer(object):
         fetched = sess.run(fetches, feed_dict=feed_dict)
 
         if should_compute_summary:
-            self.summary_writer.add_summary(tf.Summary.FromString(fetched[0]), fetched[-1])
+            self.summary_writer.add_summary(
+                tf.Summary.FromString(fetched[0]),
+                fetched[-1])
             self.summary_writer.flush()
         self.local_steps += 1

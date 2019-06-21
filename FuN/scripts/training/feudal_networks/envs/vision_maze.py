@@ -1,7 +1,7 @@
 """
-    ######################################################################################################
-    #               The purpose of this script is to envision the Maze environment                       #
-    ######################################################################################################
+##################################################################
+# The purpose of this script is to envision the Maze environment #
+##################################################################
 """
 
 
@@ -91,7 +91,6 @@ class VisionMazeEnv(gym.Env):
         r, done = 0, False
         if x == self.goal_state[0] and y == self.goal_state[1]:
             r, done = self.goal_reward, True
-            
         self.state = np.array([x, y])
         return self._get_obs(), r, done, {}
 

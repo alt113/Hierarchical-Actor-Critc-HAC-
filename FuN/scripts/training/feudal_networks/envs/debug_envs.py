@@ -1,5 +1,6 @@
 """
-        Note: adapted from the original debugging environment to have Box obs space
+        Note: adapted from the original debugging
+        environment to have Box obs space
 
         Simple environment with known optimal policy and value function.
 
@@ -23,7 +24,7 @@ class OneRoundDeterministicRewardBoxObsEnv(gym.Env):
 
     """
 
-    def __init__(self, obs_shape=(64,64,1)):
+    def __init__(self, obs_shape=(64, 64, 1)):
         """
         Instantiate a OneRoundDeterministicRewardBoxObsEnv object.
 

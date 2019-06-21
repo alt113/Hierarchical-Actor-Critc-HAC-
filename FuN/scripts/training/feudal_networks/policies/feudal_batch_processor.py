@@ -1,7 +1,7 @@
 """
-    ######################################################################################################
-    #                                    Feudal Network batch data processor script                      #
-    ######################################################################################################
+##############################################
+# Feudal Network batch data processor script #
+##############################################
 """
 
 
@@ -11,7 +11,8 @@ from collections import namedtuple
 
 def cosine_similarity(u, v):
     """
-    Cosine similarity function as is defined here: https://reference.wolfram.com/language/ref/CosineDistance.html
+    Cosine similarity function as is defined here:
+    https://reference.wolfram.com/language/ref/CosineDistance.html
 
     Parameters
     ----------
@@ -20,10 +21,18 @@ def cosine_similarity(u, v):
     v : vector
         value vector
     """
-    return np.dot(np.squeeze(u),np.squeeze(v)) / (np.linalg.norm(u) * np.linalg.norm(v))
+    return np.dot(np.squeeze(u),
+                  np.squeeze(v)) / (np.linalg.norm(u) * np.linalg.norm(v))
 
 
-Batch = namedtuple("Batch", ["obs", "a", "returns", "s_diff", "ri", "gsum", "features"])
+Batch = namedtuple("Batch",
+                   ["obs",
+                    "a",
+                    "returns",
+                    "s_diff",
+                    "ri",
+                    "gsum",
+                    "features"])
 
 
 class FeudalBatch(object):
@@ -86,7 +95,13 @@ class FeudalBatch(object):
         batch_sd = np.squeeze(np.asarray(self.s_diff))
         batch_ri = np.asarray(self.ri)
         batch_gs = np.asarray(self.gsum)
-        return Batch(batch_obs,batch_a,batch_r,batch_sd,batch_ri,batch_gs,self.features)
+        return Batch(batch_obs,
+                     batch_a,
+                     batch_r,
+                     batch_sd,
+                     batch_ri,
+                     batch_gs,
+                     self.features)
 
 
 class FeudalBatchProcessor(object):
@@ -116,7 +131,8 @@ class FeudalBatchProcessor(object):
         Parameters
         ----------
         batch : object
-            batch object containing states, goals, observations, actions, and features
+            batch object containing states,
+            goals, observations, actions, and features
         """
         if self.last_terminal:
             self.last_terminal = False
@@ -150,14 +166,16 @@ class FeudalBatchProcessor(object):
         Converts a normal batch into one used by the FeudalPolicy update.
         FeudalPolicy requires a batch of the form:
         c previous timesteps - batch size timesteps - c future timesteps
-        This class handles the tracking the leading and following timesteps over
+        This class handles the tracking the leading and
+        following timesteps over
         time. Additionally, it also computes values across timesteps from the
         batch to provide to FeudalPolicy.
 
         Parameters
         ----------
         batch : object
-            batch object containing states, goals, observations, actions, and features
+            batch object containing states,
+            goals, observations, actions, and features
         """
         # extend with current batch
         self._extend(batch)
@@ -193,8 +211,13 @@ class FeudalBatchProcessor(object):
                 gsum += self.g[i]
 
             # add to the batch
-            feudal_batch.add(self.obs[t], self.a[t], self.returns[t], s_diff,
-                ri, gsum, self.features[t])
+            feudal_batch.add(self.obs[t],
+                             self.a[t],
+                             self.returns[t],
+                             s_diff,
+                             ri,
+                             gsum,
+                             self.features[t])
 
         # in the terminal case, set reset flag
         if batch.terminal:

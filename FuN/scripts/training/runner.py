@@ -1,7 +1,7 @@
 ﻿"""
-    ######################################################################################################
-    #                          Class of scripts to run the Neural Networks                               #
-    ######################################################################################################
+#############################################
+#Class of scripts to run the Neural Networks#
+#############################################
 """
 
 
@@ -10,7 +10,8 @@ import tensorflow as tf
 import numpy as np
 import cv2
 
-from FuN.scripts.training.feudal_networks.policies.feudal_policy import FeudalPolicy
+from FuN.scripts.training.feudal_networks.policies.feudal_policy \
+    import FeudalPolicy
 
 env = gym.make('PongDeterministic-v0')
 
@@ -44,22 +45,21 @@ def process_frame42(frame):
 with tf.Session() as sess, sess.as_default():
     pi = FeudalPolicy([42, 42, 1], env.action_space.n, 0)
     last_state = env.reset()
-    last_c_g,last_features = pi.get_initial_features()
+    last_c_g, last_features = pi.get_initial_features()
 
     init = tf.global_variables_initializer()
     sess.run(init)
     saver = tf.train.Saver()
     # saver.restore(sess, tf.train.latest_checkpoint('/tmp/pong/train/'))
-    
     while True:
         terminal_end = False
 
         for _ in range(1000):
             last_state = process_frame42(last_state)
-            fetched = pi.act(last_state,last_c_g, *last_features)
-            action, value_, g,s,last_c_g,features = fetched[0], fetched[1], \
-                                                    fetched[2], fetched[3], \
-                                                    fetched[4], fetched[5:]
+            fetched = pi.act(last_state, last_c_g, *last_features)
+            action, value_, g, s, last_c_g, features = \
+                fetched[0], fetched[1], fetched[2],\
+                fetched[3], fetched[4], fetched[5:]
             action_to_take = action.argmax()
             state, reward, terminal, _ = env.step(action_to_take)
 
@@ -70,13 +70,16 @@ with tf.Session() as sess, sess.as_default():
             last_state = state
             last_features = features
 
-            timestep_limit = env.spec.tags.get('wrapper_config.TimeLimit.max_episode_steps')
+            timestep_limit =\
+                env.spec.tags.get('wrapper_config.TimeLimit.max_episode_steps')
             if terminal or length >= timestep_limit:
                 terminal_end = True
-                if length >= timestep_limit or not env.metadata.get('semantics.autoreset'):
+                if length >= timestep_limit or \
+                        not env.metadata.get('semantics.autoreset'):
                     last_state = env.reset()
-                last_c_g,last_features = pi.get_initial_features()
-                print("Episode finished. Sum of rewards: %f. Length: %d" % (rewards, length))
+                last_c_g, last_features = pi.get_initial_features()
+                print("Episode finished. Sum of rewards: %f. Length: %d"
+                      % (rewards, length))
                 length = 0
                 rewards = 0
                 break
