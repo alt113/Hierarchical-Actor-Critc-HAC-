@@ -1,7 +1,7 @@
 """
-    ######################################################################################################
-    #               Class of scripts to create the intended environments for training/testing            #
-    ######################################################################################################
+###########################################################################
+#Class of scripts to create the intended environments for training/testing#
+###########################################################################
 """
 
 
@@ -13,7 +13,8 @@ from gym import spaces
 import logging
 import universe
 from universe import vectorized
-from universe.wrappers import BlockingReset, GymCoreAction, EpisodeID, Unvectorize, Vectorize, Vision, Logger
+from universe.wrappers import BlockingReset, GymCoreAction, EpisodeID,\
+    Unvectorize, Vectorize, Vision, Logger
 from universe import spaces as vnc_spaces
 from universe.spaces.vnc_event import keycode
 import time
@@ -100,8 +101,12 @@ def create_flash_env(env_id, client_id, remotes, **_):
     env = EpisodeID(env)
     env = DiagnosticsInfo(env)
     env = Unvectorize(env)
-    env.configure(fps=5.0, remotes=remotes, start_timeout=15 * 60, client_id=client_id,
-                  vnc_driver='go', vnc_kwargs={
+    env.configure(fps=5.0,
+                  remotes=remotes,
+                  start_timeout=15 * 60,
+                  client_id=client_id,
+                  vnc_driver='go',
+                  vnc_kwargs={
                     'encoding': 'tight', 'compress_level': 0,
                     'fine_quality_level': 50, 'subsample_level': 3})
     return env
@@ -133,7 +138,10 @@ def create_vncatari_env(env_id, client_id, remotes, **_):
 
     logger.info('Connecting to remotes: %s', remotes)
     fps = env.metadata['video.frames_per_second']
-    env.configure(remotes=remotes, start_timeout=15 * 60, fps=fps, client_id=client_id)
+    env.configure(remotes=remotes,
+                  start_timeout=15 * 60,
+                  fps=fps,
+                  client_id=client_id)
     return env
 
 
@@ -219,7 +227,7 @@ class DiagnosticsInfoI(vectorized.Filter):
 
     def _after_step(self, observation, reward, done, info):
         """
-        Private utility function to help step forward in time and collect rewards
+        Private utility function to help step forward and collect rewards
 
         Parameters
         ----------
@@ -251,29 +259,43 @@ class DiagnosticsInfoI(vectorized.Filter):
                 to_log["diagnostics/fps_within_episode"] = fps
             self._last_episode_id = cur_episode_id
             if info.get("stats.gauges.diagnostics.lag.action") is not None:
-                to_log["diagnostics/action_lag_lb"] = info["stats.gauges.diagnostics.lag.action"][0]
-                to_log["diagnostics/action_lag_ub"] = info["stats.gauges.diagnostics.lag.action"][1]
+                to_log["diagnostics/action_lag_lb"] =\
+                    info["stats.gauges.diagnostics.lag.action"][0]
+                to_log["diagnostics/action_lag_ub"] =\
+                    info["stats.gauges.diagnostics.lag.action"][1]
             if info.get("reward.count") is not None:
-                to_log["diagnostics/reward_count"] = info["reward.count"]
+                to_log["diagnostics/reward_count"] =\
+                    info["reward.count"]
             if info.get("stats.gauges.diagnostics.clock_skew") is not None:
-                to_log["diagnostics/clock_skew_lb"] = info["stats.gauges.diagnostics.clock_skew"][0]
-                to_log["diagnostics/clock_skew_ub"] = info["stats.gauges.diagnostics.clock_skew"][1]
-            if info.get("stats.gauges.diagnostics.lag.observation") is not None:
-                to_log["diagnostics/observation_lag_lb"] = info["stats.gauges.diagnostics.lag.observation"][0]
-                to_log["diagnostics/observation_lag_ub"] = info["stats.gauges.diagnostics.lag.observation"][1]
+                to_log["diagnostics/clock_skew_lb"] =\
+                    info["stats.gauges.diagnostics.clock_skew"][0]
+                to_log["diagnostics/clock_skew_ub"] =\
+                    info["stats.gauges.diagnostics.clock_skew"][1]
+            if info.get("stats.gauges.diagnostics.lag.observation") \
+                    is not None:
+                to_log["diagnostics/observation_lag_lb"] =\
+                    info["stats.gauges.diagnostics.lag.observation"][0]
+                to_log["diagnostics/observation_lag_ub"] =\
+                    info["stats.gauges.diagnostics.lag.observation"][1]
 
             if info.get("stats.vnc.updates.n") is not None:
-                to_log["diagnostics/vnc_updates_n"] = info["stats.vnc.updates.n"]
-                to_log["diagnostics/vnc_updates_n_ps"] = self._num_vnc_updates / elapsed
+                to_log["diagnostics/vnc_updates_n"] =\
+                    info["stats.vnc.updates.n"]
+                to_log["diagnostics/vnc_updates_n_ps"] =\
+                    self._num_vnc_updates / elapsed
                 self._num_vnc_updates = 0
             if info.get("stats.vnc.updates.bytes") is not None:
-                to_log["diagnostics/vnc_updates_bytes"] = info["stats.vnc.updates.bytes"]
+                to_log["diagnostics/vnc_updates_bytes"] =\
+                    info["stats.vnc.updates.bytes"]
             if info.get("stats.vnc.updates.pixels") is not None:
-                to_log["diagnostics/vnc_updates_pixels"] = info["stats.vnc.updates.pixels"]
+                to_log["diagnostics/vnc_updates_pixels"] =\
+                    info["stats.vnc.updates.pixels"]
             if info.get("stats.vnc.updates.rectangles") is not None:
-                to_log["diagnostics/vnc_updates_rectangles"] = info["stats.vnc.updates.rectangles"]
+                to_log["diagnostics/vnc_updates_rectangles"] =\
+                    info["stats.vnc.updates.rectangles"]
             if info.get("env_status.state_id") is not None:
-                to_log["diagnostics/env_state_id"] = info["env_status.state_id"]
+                to_log["diagnostics/env_state_id"] =\
+                    info["env_status.state_id"]
 
         if reward is not None:
             self._episode_reward += reward
@@ -282,12 +304,16 @@ class DiagnosticsInfoI(vectorized.Filter):
             self._all_rewards.append(reward)
 
         if done:
-            logger.info('Episode terminating: episode_reward=%s episode_length=%s', self._episode_reward, self._episode_length)
+            logger.info(
+                'Episode terminating: episode_reward=%s episode_length=%s',
+                self._episode_reward,
+                self._episode_length)
             total_time = time.time() - self._episode_time
             to_log["global/episode_reward"] = self._episode_reward
             to_log["global/episode_length"] = self._episode_length
             to_log["global/episode_time"] = total_time
-            to_log["global/reward_per_time"] = self._episode_reward / total_time
+            to_log["global/reward_per_time"] =\
+                self._episode_reward / total_time
             self._episode_reward = 0
             self._episode_length = 0
             self._all_rewards = []
@@ -297,7 +323,7 @@ class DiagnosticsInfoI(vectorized.Filter):
 
 def _process_frame42(frame):
     """
-    Private utility function that helps process the frames of the Atari environment.
+    Private function that helps process the frames of the Atari environment.
 
     Parameters
     ----------
@@ -336,7 +362,7 @@ class AtariRescale42x42(vectorized.ObservationWrapper):
 
     def _observation(self, observation_n):
         """
-        Private utility function to help processing the frames of the Atari game
+        Private function to help processing the frames of the Atari game
 
         Parameters
         ----------
@@ -391,14 +417,18 @@ class FixedKeyState(object):
 
 class DiscreteToFixedKeysVNCActions(vectorized.ActionWrapper):
     """
-    Define a fixed action space. Action 0 is all keys up. Each element of keys can be a single key or a space-separated list of keys
+    Define a fixed action space. Action 0 is all keys up.
+    Each element of keys can be a single key or
+    a space-separated list of keys
 
     For example,
        e=DiscreteToFixedKeysVNCActions(e, ['left', 'right'])
     will have 3 actions: [none, left, right]
 
-    You can define a state with more than one key down by separating with spaces. For example,
-       e=DiscreteToFixedKeysVNCActions(e, ['left', 'right', 'space', 'left space', 'right space'])
+    You can define a state with more than one key down by
+    separating with spaces. For example,
+       e=DiscreteToFixedKeysVNCActions(e, ['left', 'right', 'space',
+       'left space', 'right space'])
     will have 6 actions: [none, left, right, space, left space, right space]
     """
     def __init__(self, env, keys):
@@ -433,7 +463,8 @@ class DiscreteToFixedKeysVNCActions(vectorized.ActionWrapper):
             split_keys = key.split(' ')
             cur_action = []
             for cur_key in uniq_keys:
-                cur_action.append(vnc_spaces.KeyEvent.by_name(cur_key, down=(cur_key in split_keys)))
+                cur_action.append(vnc_spaces.KeyEvent.by_name(
+                    cur_key, down=(cur_key in split_keys)))
             self._actions.append(cur_action)
         self.key_state = FixedKeyState(uniq_keys)
 
@@ -481,7 +512,7 @@ class CropScreen(vectorized.ObservationWrapper):
 
     def _observation(self, observation_n):
         """
-        Private utility function in charge of returning an observation of the environment
+        Private function for returning an observation of the environment
         based on the crop settings.
 
         Parameters
@@ -489,7 +520,8 @@ class CropScreen(vectorized.ObservationWrapper):
         observation_n : object
             A list of observations
         """
-        return [ob[self.top:self.top+self.height, self.left:self.left+self.width, :] if ob is not None else None
+        return [ob[self.top:self.top+self.height,
+                self.left:self.left+self.width, :] if ob is not None else None
                 for ob in observation_n]
 
 
@@ -536,4 +568,5 @@ class FlashRescale(vectorized.ObservationWrapper):
         observation_n : object
             Observation object
         """
-        return [_process_frame_flash(observation) for observation in observation_n]
+        return [_process_frame_flash(observation)
+                for observation in observation_n]

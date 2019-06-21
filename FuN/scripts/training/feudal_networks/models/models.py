@@ -1,7 +1,7 @@
 """
-    ######################################################################################################
-    #               The purpose of this script is to model the LSTM network                              #
-    ######################################################################################################
+###########################################################
+# The purpose of this script is to model the LSTM network #
+###########################################################
 """
 
 import numpy as np
@@ -41,7 +41,8 @@ def normalized_columns_initializer(std=1.0):
 
 def linear(x, size, name, initializer=None, bias_init=0):
     """
-    Utility linear function of the form f = wx + b; where w = weights and b = biases; these may be matrices.
+    Utility linear function of the form f = wx + b;
+    where w = weights and b = biases; these may be matrices.
 
     Parameters
     ----------
@@ -56,13 +57,24 @@ def linear(x, size, name, initializer=None, bias_init=0):
     bias_init : int
         bias initialization value
     """
-    w = tf.get_variable(name + "/w", [x.get_shape()[1], size], initializer=initializer)
-    b = tf.get_variable(name + "/b", [size], initializer=tf.constant_initializer(bias_init))
+    w = tf.get_variable(name + "/w",
+                        [x.get_shape()[1],
+                         size],
+                        initializer=initializer)
+    b = tf.get_variable(name + "/b", [size],
+                        initializer=tf.constant_initializer(
+                            bias_init))
     return tf.matmul(x, w) + b
 
 
-def conv2d(x, num_filters, name, filter_size=(3, 3), stride=(1, 1), pad="SAME",
-        dtype=tf.float32, collections=None):
+def conv2d(x,
+           num_filters,
+           name,
+           filter_size=(3, 3),
+           stride=(1, 1),
+           pad="SAME",
+           dtype=tf.float32,
+           collections=None):
     """
     2-D convolution function.
 
@@ -88,7 +100,7 @@ def conv2d(x, num_filters, name, filter_size=(3, 3), stride=(1, 1), pad="SAME",
     with tf.variable_scope(name):
         stride_shape = [1, stride[0], stride[1], 1]
         filter_shape = [filter_size[0], filter_size[1],
-            int(x.get_shape()[3]), num_filters]
+                        int(x.get_shape()[3]), num_filters]
 
         # there are "num input feature maps * filter height * filter width"
         # inputs to each hidden unit
@@ -101,11 +113,13 @@ def conv2d(x, num_filters, name, filter_size=(3, 3), stride=(1, 1), pad="SAME",
         w_bound = np.sqrt(6. / (fan_in + fan_out))
 
         w = tf.get_variable("W", filter_shape, dtype,
-            tf.random_uniform_initializer(-w_bound, w_bound),
-            collections=collections)
+                            tf.random_uniform_initializer(
+                                -w_bound,
+                                w_bound),
+                            collections=collections)
         b = tf.get_variable("b", [1, 1, 1, num_filters],
-            initializer=tf.constant_initializer(0.0),
-            collections=collections)
+                            initializer=tf.constant_initializer(0.0),
+                            collections=collections)
         return tf.nn.conv2d(x, w, stride_shape, pad) + b
 
 
@@ -128,12 +142,13 @@ def build_lstm(x, size, name, step_size):
     h_init = np.zeros((1, lstm.state_size.h), np.float32)
     state_init = [c_init, h_init]
 
-    c_in = tf.placeholder(tf.float32, 
-            shape=[1, lstm.state_size.c],
-            name='c_in')
-    h_in = tf.placeholder(tf.float32, 
-            shape=[1, lstm.state_size.h],
-            name='h_in')
+    c_in = tf.placeholder(
+        tf.float32,
+        shape=[1, lstm.state_size.c],
+        name='c_in')
+    h_in = tf.placeholder(tf.float32,
+                          shape=[1, lstm.state_size.h],
+                          name='h_in')
     state_in = [c_in, h_in]
 
     state_in = rnn.LSTMStateTuple(c_in, h_in)
@@ -154,7 +169,7 @@ class SingleStepLSTM(object):
 
     """
 
-    def __init__(self,x,size,step_size):
+    def __init__(self, x, size, step_size):
         """
         Instantiate a regular LSTM network.
 
@@ -173,12 +188,12 @@ class SingleStepLSTM(object):
         h_init = np.zeros((1, lstm.state_size.h), np.float32)
         self.state_init = [c_init, h_init]
 
-        c_in = tf.placeholder(tf.float32, 
-                shape=[1, lstm.state_size.c],
-                name='c_in')
-        h_in = tf.placeholder(tf.float32, 
-                shape=[1, lstm.state_size.h],
-                name='h_in')
+        c_in = tf.placeholder(tf.float32,
+                              shape=[1, lstm.state_size.c],
+                              name='c_in')
+        h_in = tf.placeholder(tf.float32,
+                              shape=[1, lstm.state_size.h],
+                              name='h_in')
         self.state_in = [c_in, h_in]
 
         state_in = rnn.LSTMStateTuple(c_in, h_in)

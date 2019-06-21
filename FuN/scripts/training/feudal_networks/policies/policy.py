@@ -1,7 +1,7 @@
 """
-    ######################################################################################################
-    #                          Script containing the base Neural Network policy class                    #
-    ######################################################################################################
+##########################################################
+# Script containing the base Neural Network policy class #
+##########################################################
 """
 
 
@@ -19,14 +19,15 @@ class Policy(object):
 
     Further, upon initialization the following member variables should be
     defined:
-        loss        - The tensorflow operation defining the loss function of the
+        loss        - The tensorflow operation defining the
+                        loss function of the
                       policy with respect to a batch of training data
         var_list    - The variables that should be trained by the optimizer
         internals_in- A list of placeholder variables needed at runtime
                       in order to calculate act(), value() or update()
                       (e.g. internal LSTM state)
     """
-    def __init__(self,obs_space,act_space,config):
+    def __init__(self, obs_space, act_space, config):
         """
          Instantiate an Neural Network policy object.
 
@@ -64,7 +65,8 @@ class Policy(object):
 
     def act(self, obs, prev_internal):
         """
-        Function to allow the network to start acting based on the environmental
+        Function to allow the network to start acting
+        based on the environmental
         observations and previous internal states.
 
         Parameters
@@ -103,5 +105,3 @@ class Policy(object):
             Batch object of data for the neural network
         """
         raise NotImplementedError("Please Implement this method")
-
-
