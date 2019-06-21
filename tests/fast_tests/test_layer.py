@@ -1,10 +1,10 @@
 import unittest
 import numpy as np
 import tensorflow as tf
-from setup_scripts import setup_ur5
+# from setup_scripts import setup_ur5
 from hac.layer import Layer
 from hac.options import parse_options
-
+from tests.fast_tests.setup_scripts import setup_ur5
 
 class TestLayer(unittest.TestCase):
     """Tests the Layer class."""
