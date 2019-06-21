@@ -6,6 +6,7 @@ from hac.actor import Actor
 from hac.options import parse_options
 from tests.fast_tests.setup_scripts import setup_ur5
 
+
 class TestActor(unittest.TestCase):
     """Tests the Actor class."""
 
