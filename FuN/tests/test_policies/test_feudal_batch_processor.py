@@ -8,7 +8,7 @@
 import numpy as np
 import unittest
 from FuN.scripts.training.feudal_networks.policies.feudal_batch_processor \
-    import FeudalBatchProcessor, FeudalBatch
+    import FeudalBatchProcessor
 from FuN.scripts.training.feudal_networks.algos.policy_optimizer import Batch
 
 

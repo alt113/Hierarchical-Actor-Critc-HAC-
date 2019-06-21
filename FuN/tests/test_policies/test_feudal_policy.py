@@ -35,11 +35,11 @@ class TestFeudalPolicy(unittest.TestCase):
 
         """
 
-        global_step = tf.get_variable("global_step", [], tf.int32,
-                                      initializer=tf.constant_initializer(
-                                          0, dtype=tf.int32),
-                                      trainable=False)
-        feudal = FeudalPolicy((80, 80, 3), 4, global_step)
+        # global_step = tf.get_variable("global_step", [], tf.int32,
+        #                               initializer=tf.constant_initializer(
+        #                                   0, dtype=tf.int32),
+        #                               trainable=False)
+        # feudal = FeudalPolicy((80, 80, 3), 4, global_step)
 
     def test_fit_simple_dataset(self):
         """
@@ -56,8 +56,8 @@ class TestFeudalPolicy(unittest.TestCase):
             act_space = 2
             lr = 1e-5
             g_dim = 256
-            worker_hid_dim = 32
-            manager_hid_dim = 256
+            # worker_hid_dim = 32
+            # manager_hid_dim = 256
             pi = FeudalPolicy(obs_space, act_space, global_step)
 
             grads = tf.gradients(pi.loss, pi.var_list)
@@ -126,8 +126,8 @@ class TestFeudalPolicy(unittest.TestCase):
             act_space = 2
             lr = 5e-4
             g_dim = 256
-            worker_hid_dim = 32
-            manager_hid_dim = 256
+            # worker_hid_dim = 32
+            # manager_hid_dim = 256
             pi = FeudalPolicy(obs_space, act_space, global_step)
             train_op = tf.train.AdamOptimizer(lr).minimize(pi.loss)
 
