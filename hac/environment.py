@@ -315,8 +315,7 @@ class Environment(gym.Env):
         # Else goal is achieved
         return 0
 
-
-
+    
 class UR5(Environment):
     """TODO
 
