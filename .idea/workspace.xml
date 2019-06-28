@@ -27,8 +27,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/hac/environment.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="195">
-              <caret line="317" column="4" selection-start-line="317" selection-start-column="4" selection-end-line="317" selection-end-column="4" />
+            <state relative-caret-position="338">
+              <caret line="320" column="4" selection-start-line="320" selection-start-column="4" selection-end-line="320" selection-end-column="4" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -51,12 +51,13 @@
       <find>get</find>
       <find>layer_number</find>
       <find>get_reward</find>
-      <find>reward</find>
       <find>trans_copy</find>
       <find>state</find>
       <find>replay_buffer</find>
       <find>temp_goal_replay_storage</find>
       <find>new_goal</find>
+      <find>compute_reward</find>
+      <find>reward</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -180,7 +181,7 @@
       <workItem from="1560794453357" duration="2066000" />
       <workItem from="1561093879353" duration="1085000" />
       <workItem from="1561141712365" duration="10514000" />
-      <workItem from="1561744950448" duration="5602000" />
+      <workItem from="1561744950448" duration="5799000" />
     </task>
     <servers />
   </component>
@@ -190,7 +191,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="19267000" />
+    <option name="totallyTimeSpent" value="19464000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1440" height="877" extended-state="0" />
@@ -200,7 +201,7 @@
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.3299363" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.3299363" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
@@ -572,8 +573,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/hac/environment.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="317" column="4" selection-start-line="317" selection-start-column="4" selection-end-line="317" selection-end-column="4" />
+        <state relative-caret-position="338">
+          <caret line="320" column="4" selection-start-line="320" selection-start-column="4" selection-end-line="320" selection-end-column="4" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>

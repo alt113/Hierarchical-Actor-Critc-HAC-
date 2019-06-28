@@ -315,13 +315,11 @@ class Environment(gym.Env):
         # Else goal is achieved
         return 0
 
-    
-class UR5(Environment):
-    """TODO
 
+class UR5(Environment):
+    """
     TODO
     """
-
     @property
     def observation_space(self):
         return gym.spaces.Box(
