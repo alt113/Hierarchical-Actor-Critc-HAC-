@@ -2,6 +2,7 @@ import numpy as np
 import gym
 from hac.utils import check_validity
 from hac.agent import Agent
+from hac.layer import Layer
 
 try:
     import mujoco_py
@@ -240,6 +241,30 @@ class Environment(gym.Env):
                (observation, reward, done, info)
         """
         return self.get_state(), None, None, {}
+
+    @staticmethod
+    def get_reward(env_state, layer_num):
+        """Return reward given provided goal and goal achieved in hindsight.
+
+        Parameters
+        ----------
+        env_state : array_like
+            TODO
+        layer_num : array_like
+            TODO
+
+        Returns
+        -------
+        float
+            reward value
+
+        Raises
+        ------
+        AssertionError
+            if the goal, hindsight goal, and goal thresholds do not have same
+            dimensions
+        """
+        pass
 
     def display_end_goal(self, end_goal):
         """Visualize end goal.

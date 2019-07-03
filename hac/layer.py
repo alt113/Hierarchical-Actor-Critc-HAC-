@@ -3,6 +3,7 @@ from copy import deepcopy
 from hac.experience_buffer import ExperienceBuffer
 from hac.actor import Actor
 from hac.critic import Critic
+from hac.environment import Environment
 
 
 class Layer:
@@ -425,9 +426,18 @@ class Layer:
                 # Update goal to new goal
                 trans_copy[index][4] = new_goal
 
+                """
+                OLD WAY
+                """
                 # Update reward
-                trans_copy[index][2] = self.get_reward(
-                    new_goal, trans_copy[index][6], goal_thresholds)
+                # trans_copy[index][2] = self.get_reward(
+                #     new_goal, trans_copy[index][6], goal_thresholds)
+
+                """
+                NEW WAY
+                """
+                trans_copy[index][2] = Environment.get_reward(self.current_state,
+                                                              self.layer_number)
 
                 # Update finished boolean based on reward
                 if trans_copy[index][2] == 0:

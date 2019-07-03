@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b38268ca-12aa-4915-bbaa-df87b354e304" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/hac/environment.py" beforeDir="false" afterPath="$PROJECT_DIR$/hac/environment.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/hac/layer.py" beforeDir="false" afterPath="$PROJECT_DIR$/hac/layer.py" afterDir="false" />
     </list>
@@ -20,11 +19,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/hac/layer.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1253">
-              <caret line="624" column="45" lean-forward="true" selection-start-line="624" selection-start-column="45" selection-end-line="624" selection-end-column="45" />
-              <folding>
-                <element signature="e#0#18#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="190">
+              <caret line="431" column="31" lean-forward="true" selection-start-line="431" selection-start-column="31" selection-end-line="431" selection-end-column="31" />
             </state>
           </provider>
         </entry>
@@ -32,8 +28,11 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/hac/environment.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="502">
-              <caret line="241" column="47" selection-start-line="241" selection-start-column="47" selection-end-line="241" selection-end-column="47" />
+            <state relative-caret-position="273">
+              <caret line="251" column="16" lean-forward="true" selection-start-line="251" selection-start-column="16" selection-end-line="251" selection-end-column="16" />
+              <folding>
+                <element signature="e#0#18#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -56,7 +55,6 @@
       <find>actor</find>
       <find>choose</find>
       <find>get_rand</find>
-      <find>env</find>
       <find>envir</find>
       <find>subgoal_dim</find>
       <find>action_space</find>
@@ -69,6 +67,9 @@
       <find>noise_per</find>
       <find>choose_ac</find>
       <find>step</find>
+      <find>env</find>
+      <find>state</find>
+      <find>get_reward</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -203,13 +204,13 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="18336000" />
+    <option name="totallyTimeSpent" value="19392000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1440" height="877" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.26752505" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.2639485" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -578,18 +579,18 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/hac/layer.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1253">
-          <caret line="624" column="45" lean-forward="true" selection-start-line="624" selection-start-column="45" selection-end-line="624" selection-end-column="45" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="190">
+          <caret line="431" column="31" lean-forward="true" selection-start-line="431" selection-start-column="31" selection-end-line="431" selection-end-column="31" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/hac/environment.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="502">
-          <caret line="241" column="47" selection-start-line="241" selection-start-column="47" selection-end-line="241" selection-end-column="47" />
+        <state relative-caret-position="273">
+          <caret line="251" column="16" lean-forward="true" selection-start-line="251" selection-start-column="16" selection-end-line="251" selection-end-column="16" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
