@@ -258,7 +258,7 @@ class Layer:
 
             # Otherwise, choose random action
             else:
-                action = self.get_random_action(env)
+                action = env.get_random_action(self.layer_number)
                 action_type = "Random"
 
             # Determine whether to test upcoming subgoal
@@ -579,8 +579,17 @@ class Layer:
         while True:
             # Select action to achieve goal state using epsilon-greedy policy
             # or greedy policy if in test mode
-            action, action_type, next_subgoal_test = self.choose_action(
-                agent, env, subgoal_test)
+
+            # action, action_type, next_subgoal_test = self.choose_action(
+            #     agent, env, subgoal_test)
+
+            action, action_type, next_subgoal_test = env.choose_action(agent,
+                                                                       self.actor,
+                                                                       subgoal_test,
+                                                                       self.layer_number,
+                                                                       self.current_state,
+                                                                       self.goal,
+                                                                       self.noise_perc)
 
             # If next layer is not bottom level, propose subgoal for next layer
             # to achieve and determine whether that subgoal should be tested

@@ -1,6 +1,7 @@
 import numpy as np
 import gym
 from hac.utils import check_validity
+from hac.agent import Agent
 
 try:
     import mujoco_py
@@ -233,7 +234,12 @@ class Environment(gym.Env):
             if self.visualize:
                 self.render()
 
-        return self.get_state(), None, None, {}  # FIXME
+        # TODO
+        """
+                Should return 
+               (observation, reward, done, info)
+        """
+        return self.get_state(), None, None, {}
 
     def display_end_goal(self, end_goal):
         """Visualize end goal.
@@ -275,6 +281,150 @@ class Environment(gym.Env):
 
     def render(self, mode='human'):  # TODO: make better
         self.viewer.render()
+
+    """
+    ################
+    ################
+    ################
+    """
+    # TODO fix documentation of below function
+    def get_random_action(self, layer_number):
+        """Select random action.
+
+        Parameters
+        ----------
+        layer_number : hac.Environment
+            the training environment
+
+        Returns
+        -------
+        array_like
+            a random action, within the bounds that are specified in the
+            environment
+        """
+        if layer_number == 0:
+            action = np.zeros(self.action_space.shape[0])
+        else:
+            action = np.zeros(self.subgoal_dim)
+
+        # Each dimension of random action should take some value in the
+        # dimension's range
+        for i in range(len(action)):
+            if layer_number == 0:
+                ac_space = self.action_space
+                action_bounds = (ac_space.high - ac_space.low) / 2
+                action_offset = (ac_space.high + ac_space.low) / 2
+
+                action[i] = np.random.uniform(
+                    - action_bounds[i] + action_offset[i],
+                    + action_bounds[i] + action_offset[i])
+            else:
+                action[i] = np.random.uniform(
+                    self.subgoal_bounds[i][0], self.subgoal_bounds[i][1])
+
+        return action
+
+    def choose_action(self,
+                      agent,
+                      actor,
+                      subgoal_test,
+                      layer_number,
+                      current_state,
+                      goal,
+                      noise_perc):
+        """Select action using an epsilon-greedy policy.
+
+        Parameters
+        ----------
+        agent : hac.Agent
+            the agent class
+        env : hac.Environment
+            the training environment
+        subgoal_test : bool
+            TODO
+
+        Returns
+        -------
+        array_like
+            the action by the agent
+        str
+            the action type, one of: {"Policy", "Noise Policy", "Random"}
+        bool
+            specifies whether to perform evaluation on the next subgoal
+        """
+        # If testing mode or testing subgoals, action is output of actor
+        # network without noise
+        if agent.flags.test or subgoal_test:
+            return actor.get_action(
+                np.reshape(current_state,
+                           (1, len(current_state))),
+                np.reshape(goal, (1, len(goal)))
+            )[0], "Policy", subgoal_test
+
+        else:
+            if np.random.random_sample() > 0.2:
+                # Choose noisy action
+                action = self.add_noise(actor.get_action(
+                    np.reshape(current_state,
+                               (1, len(current_state))),
+                    np.reshape(goal, (1, len(goal))))[0],
+                                        layer_number,
+                                        noise_perc)
+                action_type = "Noisy Policy"
+
+            # Otherwise, choose random action
+            else:
+                action = self.get_random_action(layer_number)
+                action_type = "Random"
+
+            # Determine whether to test upcoming subgoal
+            if np.random.random_sample() < agent.subgoal_test_perc:
+                next_subgoal_test = True
+            else:
+                next_subgoal_test = False
+
+            return action, action_type, next_subgoal_test
+
+    def add_noise(self,
+                  action,
+                  layer_number,
+                  noise_perc):
+        """Add noise to provided action.
+
+        Parameters
+        ----------
+        action : hac.Agent
+            the agent class
+
+        Returns
+        -------
+        array_like
+            the action with noise
+        """
+        # Noise added will be percentage of range
+        if layer_number == 0:
+            ac_space = self.action_space
+            action_bounds = (ac_space.high - ac_space.low) / 2
+            action_offset = (ac_space.high + ac_space.low) / 2
+        else:
+            action_bounds = self.subgoal_bounds_symmetric
+            action_offset = self.subgoal_bounds_offset
+
+        assert len(action) == len(action_bounds), \
+            "Action bounds must have same dimension as action"
+        assert len(action) == len(noise_perc), \
+            "Noise percentage vector must have same dimension as action"
+
+        # Add noise to action and ensure remains within bounds
+        for i in range(len(action)):
+            action[i] += np.random.normal(
+                0, noise_perc[i] * action_bounds[i])
+
+            action[i] = max(min(action[i], action_bounds[i]+action_offset[i]),
+                            -action_bounds[i]+action_offset[i])
+
+        return action
+
 
 
 class UR5(Environment):
