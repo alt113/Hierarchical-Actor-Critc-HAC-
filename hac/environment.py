@@ -1,5 +1,6 @@
 import numpy as np
 import gym
+import os
 from hac.utils import check_validity
 from hac.agent import Agent
 from hac.layer import Layer
@@ -31,7 +32,7 @@ class Environment(gym.Env):
     end_goal_dim : int
         TODO
     subgoal_dim : int
-        TODO
+        number of subgoal actions
     subgoal_bounds : array_like
         range for each dimension of subgoal space
     project_state_to_end_goal : function
@@ -39,9 +40,9 @@ class Environment(gym.Env):
     project_state_to_subgoal : function
         state to subgoal projection function
     subgoal_bounds_symmetric : array_like
-        TODO
+        scaling factor for the subgoal actions
     subgoal_bounds_offset : array_like
-        TODO
+        offset variable for the subgoal actions
     end_goal_thresholds : array_like
         goal achievement thresholds. If the agent is within the threshold for
         each dimension, the end goal has been achieved and the reward of 0 is
@@ -129,8 +130,10 @@ class Environment(gym.Env):
         self.name = model_name
 
         # Create Mujoco Simulation
+        mujoco_file_path = os.path.abspath(os.path.join(
+            os.path.dirname(__file__), '../example_designs/mujoco_files/'))
         self.model = mujoco_py.load_model_from_path(
-            "./mujoco_files/" + model_name)
+            os.path.join(mujoco_file_path, model_name))
         self.sim = mujoco_py.MjSim(self.model)
 
         # Set dimensions and ranges of states, actions, and goals in order to

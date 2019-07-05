@@ -1,5 +1,7 @@
 """Utility methods for the training procedure."""
 import tensorflow as tf
+import errno
+import os
 
 
 def layer(input_layer, num_next_neurons, is_output=False):
@@ -125,3 +127,13 @@ def check_validity(model_name,
 
     assert timesteps_per_action > 0, \
         "Timesteps per action should be a positive integer"
+
+
+def ensure_dir(path):
+    """Ensure that the directory specified exists, and if not, create it."""
+    try:
+        os.makedirs(path)
+    except OSError as exception:
+        if exception.errno != errno.EEXIST:
+            raise
+    return path

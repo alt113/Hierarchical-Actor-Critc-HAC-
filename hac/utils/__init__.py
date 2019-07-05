@@ -1,3 +1,3 @@
-from hac.utils.utils import check_validity, layer
+from hac.utils.utils import check_validity, layer, ensure_dir
 
-__all__ = ["check_validity", "layer"]
+__all__ = ["check_validity", "layer", "ensure_dir"]

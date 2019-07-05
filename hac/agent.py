@@ -1,8 +1,8 @@
 import numpy as np
+from hac.utils import ensure_dir
 from hac.layer import Layer
 import tensorflow as tf
 import os
-import pickle as cpickle
 
 
 class Agent:
@@ -35,8 +35,6 @@ class Agent:
         number of low-level actions executed
     num_updates : int
         number of Q-value updates made after each episode
-    performance_log : list of float
-        used to store performance results
     other_params : dict
         additional agent parameters
     """
@@ -56,6 +54,10 @@ class Agent:
         self.flags = flags
         self.sess = tf.Session()
 
+        # create the writer object for logging to tensorboard
+        ensure_dir(flags.logdir)
+        self.writer = tf.summary.FileWriter(flags.logdir)
+
         # Set subgoal testing ratio each layer will use
         self.subgoal_test_perc = agent_params["subgoal_test_perc"]
 
@@ -72,6 +74,9 @@ class Agent:
         # retraining
         self.initialize_networks()
 
+        # Add the graph to tensorboard.
+        self.writer.add_graph(self.sess.graph)
+
         # goal_array will store goal for each layer of agent.
         self.goal_array = [None for _ in range(flags.layers)]
 
@@ -83,9 +88,6 @@ class Agent:
         # Below hyperparameter specifies number of Q-value updates made after
         # each episode
         self.num_updates = 40
-
-        # Below parameters will be used to store performance results
-        self.performance_log = []
 
         self.other_params = agent_params
 
@@ -218,8 +220,7 @@ class Agent:
         bool
             whether the end goal was achieved
         """
-        # Select final goal from final goal space, defined in
-        # "design_agent_and_env.py"
+        # Select final goal from final goal space.
         self.goal_array[self.flags.layers - 1] = env.get_next_goal(
             self.flags.test)
         print("Next End Goal: ", self.goal_array[self.flags.layers - 1])
@@ -242,19 +243,18 @@ class Agent:
         # Return whether end goal was achieved
         return goal_status[self.flags.layers-1]
 
-    def log_performance(self, success_rate):
+    def log_performance(self, success_rate, global_step):
         """Save performance evaluations.
-
-        TODO: describe how this is done and how it's helpful.
 
         Parameters
         ----------
         success_rate : float
             the percentage of the episodes that were successful during the
             evaluation procedure
+        global_step : int
+            number of training steps performed in the environment
         """
-        # Add latest success_rate to list
-        self.performance_log.append(success_rate)
-
-        # Save log
-        cpickle.dump(self.performance_log, open("performance_log.p", "wb"))
+        summary = tf.Summary()
+        summary.value.add(tag='Success Rate', simple_value=success_rate)
+        self.writer.add_summary(summary, global_step)
+        self.writer.flush()

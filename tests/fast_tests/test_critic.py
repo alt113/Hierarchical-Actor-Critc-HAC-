@@ -12,7 +12,7 @@ class TestCritic(unittest.TestCase):
     def setUp(self):
         tf.reset_default_graph()
         env = setup_ur5()
-        flags = parse_options(args=[])
+        flags = parse_options(args=['ur5'])
         self.sess = tf.Session()
         self.critic = Critic(
             sess=self.sess,

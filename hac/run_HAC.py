@@ -2,10 +2,9 @@
 
 By default, the agent will alternate between exploration and testing phases.
 The number of episodes in the exploration phase can be configured in section 3
-of "design_agent_and_env.py" file. If the user prefers to only explore or only
-test, the user can enter the command-line options ""--train_only" or "--test",
-respectively. The full list of command-line options is available in the
-"options.py" file.
+of the design files. If the user prefers to only explore or only test, the user
+can enter the command-line options ""--train_only" or "--test", respectively.
+The full list of command-line options is available in the "options.py" file.
 """
 NUM_BATCH = 1000
 TEST_FREQ = 2
@@ -63,22 +62,18 @@ def run_HAC(flags, env, agent):
             # Train for an episode
             success = agent.train(env, episode)
 
-            if success:
-                print("Batch %d, Episode %d End Goal Achieved\n"
-                      % (batch, episode))
-
-                # Increment successful episode counter if applicable
-                if mix_train_test and batch % TEST_FREQ == 0:
-                    successful_episodes += 1
+            # Increment successful episode counter if applicable
+            if success and mix_train_test and batch % TEST_FREQ == 0:
+                successful_episodes += 1
 
         # Save agent
-        agent.save_model(episode)
+        agent.save_model(batch)
 
         # Finish evaluating policy if tested prior batch
         if mix_train_test and batch % TEST_FREQ == 0:
             # Log performance
             success_rate = successful_episodes / NUM_TEST_EPISODES * 100
             print("\nTesting Success Rate %.2f%%" % success_rate)
-            agent.log_performance(success_rate)
+            agent.log_performance(success_rate, batch)  # FIXME: batch
             agent.flags.test = False
             print("\n--- END TESTING ---\n")
