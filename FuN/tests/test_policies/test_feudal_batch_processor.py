@@ -61,7 +61,7 @@ class TestFeudalBatchProcessor(unittest.TestCase):
         np.testing.assert_array_equal(fb.s_diff, [1, 1])
         self.assertEqual(len(fb.ri), 2)
         np.testing.assert_array_equal(fb.gsum, [3, 5])
-# np.testing.assert_array_equal(fb.features, [2,3])  # Error occurred here
+#        np.testing.assert_array_equal(fb.features, [2, 3])
 
         obs = [5]
         a = [5]

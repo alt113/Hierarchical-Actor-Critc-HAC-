@@ -3,6 +3,7 @@ from copy import deepcopy
 from hac.experience_buffer import ExperienceBuffer
 from hac.actor import Actor
 from hac.critic import Critic
+from hac.environment import Environment
 
 
 class Layer:
@@ -258,7 +259,7 @@ class Layer:
 
             # Otherwise, choose random action
             else:
-                action = self.get_random_action(env)
+                action = env.get_random_action(self.layer_number)
                 action_type = "Random"
 
             # Determine whether to test upcoming subgoal
@@ -425,9 +426,18 @@ class Layer:
                 # Update goal to new goal
                 trans_copy[index][4] = new_goal
 
+                """
+                OLD WAY
+                """
                 # Update reward
-                trans_copy[index][2] = self.get_reward(
-                    new_goal, trans_copy[index][6], goal_thresholds)
+                # trans_copy[index][2] = self.get_reward(
+                #     new_goal, trans_copy[index][6], goal_thresholds)
+
+                """
+                NEW WAY
+                """
+                trans_copy[index][2] = Environment.get_reward(self.current_state,
+                                                              self.layer_number)
 
                 # Update finished boolean based on reward
                 if trans_copy[index][2] == 0:
@@ -579,8 +589,17 @@ class Layer:
         while True:
             # Select action to achieve goal state using epsilon-greedy policy
             # or greedy policy if in test mode
-            action, action_type, next_subgoal_test = self.choose_action(
-                agent, env, subgoal_test)
+
+            # action, action_type, next_subgoal_test = self.choose_action(
+            #     agent, env, subgoal_test)
+
+            action, action_type, next_subgoal_test = env.choose_action(agent,
+                                                                       self.actor,
+                                                                       subgoal_test,
+                                                                       self.layer_number,
+                                                                       self.current_state,
+                                                                       self.goal,
+                                                                       self.noise_perc)
 
             # If next layer is not bottom level, propose subgoal for next layer
             # to achieve and determine whether that subgoal should be tested
